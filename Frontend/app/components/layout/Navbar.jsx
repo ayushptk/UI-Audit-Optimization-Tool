@@ -5,6 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { IoRocketOutline } from 'react-icons/io5';
 import { HiMenu, HiX } from 'react-icons/hi';
+import { motion } from 'framer-motion';
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -16,8 +17,25 @@ const Navbar = () => {
     { name: 'FAQ', href: '/faq' },
   ];
 
+  const navVariants = {
+    hidden: { y: -100, opacity: 0 },
+    visible: {
+      y: 0,
+      opacity: 1,
+      transition: {
+        duration: 0.8,
+        ease: 'easeOut',
+      },
+    },
+  };
+
   return (
-    <nav className="fixed top-4 left-1/2 transform -translate-x-1/2 z-50">
+    <motion.nav
+      className="fixed top-4 left-1/2 transform -translate-x-1/2 z-50"
+      variants={navVariants}
+      initial="hidden"
+      animate="visible"
+    >
       <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-full px-6 py-3 shadow-lg max-w-5xl">
         <div className="flex items-center  w-full gap-10">
           {/* Logo */}
@@ -80,7 +98,7 @@ const Navbar = () => {
           </div>
         )}
       </div>
-    </nav>
+    </motion.nav>
   );
 };
 

@@ -3,6 +3,8 @@
 import React, { useState } from 'react';
 import { FaChevronDown, FaChevronUp } from 'react-icons/fa';
 import { AnimatePresence, motion } from 'framer-motion';
+import { HiOutlineMail } from "react-icons/hi";
+import { IoRocketOutline } from "react-icons/io5";
 
 const Faq = () => {
   const [openIndex, setOpenIndex] = useState(null);
@@ -35,7 +37,8 @@ const Faq = () => {
   };
 
   return (
-    <section className="py-20 px-4 bg-white">
+    <div>
+    <section className="py-16 px-4 bg-white ">
       <motion.div
         className="max-w-4xl mx-auto"
         initial={{ opacity: 0, y: 50 }}
@@ -90,7 +93,38 @@ const Faq = () => {
           ))}
         </div>
       </motion.div>
+     
     </section>
+     <section className="bg-[#F6F3FF]  text-center text-white py-12  ">
+      <div className="max-w-3xl mx-auto">
+        {/* Heading */}
+        <h2 className="text-xl sm:text-2xl font-semibold mb-3 text-gray-900">
+          Still Have Questions?
+        </h2>
+
+       
+        <p className="text-sm sm:text-base  leading-relaxed mb-8 text-gray-700">
+          Our team is ready to help you find the perfect UI/UX audit solution for your product  designed to improve usability, consistency, and user trust
+        </p>
+
+        {/* Buttons */}
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+          {/* Call Us Button */}
+          <button className="flex items-center justify-center gap-2 bg-[#432DD7] text-white text-sm sm:text-base font-medium px-6 py-3 rounded-xl hover:opacity-90 transition">
+            <IoRocketOutline className="w-5 h-5 animate-pulse" />
+           Start Free Audit
+          </button>
+
+          {/* Email Us Button */}
+          <button className="flex items-center justify-center gap-2 border border-black text-black text-sm sm:text-base font-medium px-6 py-3 rounded-xl  transition">
+            <HiOutlineMail className="text-lg" />
+            Contact Support
+          </button>
+        </div>
+      </div>
+    </section>
+    </div>
+
   );
 };
 

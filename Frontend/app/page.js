@@ -4,6 +4,7 @@ import Herosection from "./components/Landing/Herosection";
 import Feature from "./components/Landing/Feature";
 import Pricing from "./components/Landing/Pricing";
 import Faq from "./components/Landing/Faq";
+import Footer from "./components/layout/Footer";
 
 
 export default function Home() {
@@ -14,7 +15,7 @@ export default function Home() {
       <Feature />
       <Pricing />
       <Faq />
-      
+      <Footer />
     </div>
   );
 }

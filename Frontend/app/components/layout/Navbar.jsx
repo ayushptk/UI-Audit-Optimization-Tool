@@ -31,12 +31,12 @@ const Navbar = () => {
 
   return (
     <motion.nav
-      className="fixed top-4 left-1/2 transform -translate-x-1/2 z-50"
+      className="absolute top-4 left-1/2 transform -translate-x-1/2 z-50"
       variants={navVariants}
       initial="hidden"
       animate="visible"
     >
-      <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-full px-6 py-3 shadow-lg max-w-5xl">
+      <div className="bg-white/10 border border-white/20 rounded-full px-6 py-3 shadow-lg max-w-5xl">
         <div className="flex items-center  w-full gap-10">
           {/* Logo */}
           <Image src="/Logo/Uiauditlogo.png" alt="Logo" width={60} height={60} className="mr-4" />

@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { FaChevronDown, FaChevronUp } from 'react-icons/fa';
+import { AnimatePresence, motion } from 'framer-motion';
 
 const Faq = () => {
   const [openIndex, setOpenIndex] = useState(null);
@@ -26,10 +27,6 @@ const Faq = () => {
     {
       question: "Can I integrate UiAudit with my workflow?",
       answer: "Yes! Pro and Enterprise plans include API access and integrations with popular design tools like Figma, Sketch, and Adobe XD."
-    },
-    {
-      question: "What if I need help with the feedback?",
-      answer: "All plans include access to our knowledge base. Pro users get priority email support, and Enterprise customers have dedicated account managers."
     }
   ];
 
@@ -39,7 +36,13 @@ const Faq = () => {
 
   return (
     <section className="py-20 px-4 bg-white">
-      <div className="max-w-4xl mx-auto">
+      <motion.div
+        className="max-w-4xl mx-auto"
+        initial={{ opacity: 0, y: 50 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+        viewport={{ once: true }}
+      >
         <div className="text-center mb-16">
             <button className="text-blue-900 border border-indigo-600 px-6 py-2 rounded-3xl mb-6">
             Frequently Asked Questions
@@ -55,27 +58,38 @@ const Faq = () => {
           {faqs.map((faq, index) => (
             <div key={index} className="border border-gray-200 rounded-lg">
               <button
-                className="w-full text-left p-6 focus:outline-none focus:ring-2 focus:ring-indigo-500 rounded-lg"
+                className="w-full text-left p-6 rounded-lg"
                 onClick={() => toggleFaq(index)}
               >
                 <div className="flex justify-between items-center">
                   <h3 className="text-lg font-semibold text-gray-900">{faq.question}</h3>
-                  {openIndex === index ? (
-                    <FaChevronUp className="text-gray-500" />
-                  ) : (
+                  <motion.div
+                    animate={{ rotate: openIndex === index ? 180 : 0 }}
+                    transition={{ duration: 0.3 }}
+                  >
                     <FaChevronDown className="text-gray-500" />
-                  )}
+                  </motion.div>
                 </div>
               </button>
-              {openIndex === index && (
-                <div className="px-6 pb-6">
-                  <p className="text-gray-600">{faq.answer}</p>
-                </div>
-              )}
+              <AnimatePresence>
+                {openIndex === index && (
+                  <motion.div
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: 'auto', opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    transition={{ duration: 0.3, ease: 'easeInOut' }}
+                    className="overflow-hidden"
+                  >
+                    <div className="px-6 pb-6">
+                      <p className="text-gray-600">{faq.answer}</p>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
           ))}
         </div>
-      </div>
+      </motion.div>
     </section>
   );
 };

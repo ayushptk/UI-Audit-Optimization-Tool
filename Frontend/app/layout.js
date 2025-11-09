@@ -36,9 +36,9 @@ export default function RootLayout({ children }) {
     }
 
     requestAnimationFrame(raf);
+  
+    
 
-    // Optional: log scroll values (for debug or animation triggers)
-    // lenis.on("scroll", ({ scroll }) => console.log(scroll));
 
     return () => lenis.destroy(); // Cleanup on unmount
   }, []);
@@ -48,7 +48,7 @@ export default function RootLayout({ children }) {
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-white text-gray-900`}
       >
-        <Navbar />
+       
         {children}
       </body>
     </html>

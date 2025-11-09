@@ -36,7 +36,7 @@ const Navbar = () => {
       initial="hidden"
       animate="visible"
     >
-      <div className="bg-white/10 border border-white/20 rounded-full px-6 py-3 shadow-lg max-w-5xl">
+      <div className="bg-white/10  border border-white/20 rounded-full px-6 py-3 shadow-lg max-w-5xl">
         <div className="flex items-center  w-full gap-10">
           {/* Logo */}
           <Image src="/Logo/Uiauditlogo.png" alt="Logo" width={60} height={60} className="mr-4" />

@@ -1,5 +1,6 @@
 'use client';
 
+import RevenueAnalyticsChart from "../components/dashboard/revenuechart";
 import StatsCard from "../components/dashboard/statscard";
 
 export default function DashboardPage() {
@@ -7,6 +8,7 @@ export default function DashboardPage() {
         <div className="">
             
            <StatsCard />
+           <RevenueAnalyticsChart />
         </div>
     );
 }

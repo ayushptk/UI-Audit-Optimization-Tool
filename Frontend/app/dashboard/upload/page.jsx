@@ -54,7 +54,7 @@ export default function UploadPage() {
   };
 
   return (
-    <div className="min-h-[calc(100vh-4rem)] w-full bg-neutral-50 px-4 py-10 sm:px-6 lg:px-8">
+    <div className="min-h-[calc(100vh-4rem)] w-full  px-4  sm:px-4 lg:px-6">
       <div className="mx-auto max-w-4xl">
         <header className="mb-8">
           <h1 className="text-2xl font-semibold tracking-tight text-neutral-900">

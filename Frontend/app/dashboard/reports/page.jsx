@@ -163,7 +163,7 @@ export default function ReportsPage() {
         </div>
         <Link
           href="/dashboard/upload"
-          className="inline-flex items-center gap-2 rounded-md bg-black text-white px-3.5 py-2 text-sm font-medium hover:bg-neutral-900 focus:outline-none focus:ring-2 focus:ring-black/20"
+          className="inline-flex items-center gap-2 rounded-md bg-blue-700 text-white px-3.5 py-2 text-sm font-medium hover:bg-blue-900 focus:outline-none focus:ring-2 focus:ring-black/20"
         >
           <FiPlus className="h-4 w-4" />
           New Upload
@@ -183,7 +183,7 @@ export default function ReportsPage() {
       </div>
 
       {/* Filters */}
-      <div className="rounded-lg border border-neutral-200 bg-white p-3 sm:p-4">
+      {/* <div className="rounded-lg border border-neutral-200 bg-white p-3 sm:p-4">
         <div className="flex flex-col lg:flex-row gap-3 lg:items-end">
           <div className="relative flex-1">
             <FiSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400" />
@@ -278,7 +278,7 @@ export default function ReportsPage() {
             </div>
           </div>
         </div>
-      </div>
+      </div> */}
 
       {/* Table */}
       <div className="overflow-hidden rounded-lg border border-neutral-200 bg-white">

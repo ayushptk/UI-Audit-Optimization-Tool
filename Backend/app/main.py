@@ -1,7 +1,11 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from app.models.user import User
+from app.database import engine, Base
+
 
 app = FastAPI(title="UIaudit Backend API")
+Base.metadata.create_all(bind=engine)
 
 # Allow frontend requests
 app.add_middleware(

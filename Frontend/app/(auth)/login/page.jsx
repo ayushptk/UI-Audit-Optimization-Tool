@@ -3,9 +3,15 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { FiEye, FiEyeOff, FiMail, FiLock, FiArrowRight, FiUser } from 'react-icons/fi';
-
+import {useDispatch} from 'react-redux';
+import { setCredentials } from "../../redux/authSlice";
+import {login} from '../../lib/api';    
+import { useRouter } from "next/navigation";
 
 export default function Login() {
+     const dispatch = useDispatch();
+  const router = useRouter();
+
     const [showPassword, setShowPassword] = useState(false);
     const [formData, setFormData] = useState({
         email: '',
@@ -21,9 +27,25 @@ export default function Login() {
         }));
     };
 
-    const handleSubmit = (e) => {
+   async function handleSubmit(e) {
         e.preventDefault();
         console.log('Login data:', formData);
+        try {
+      const res = await login(email, password);
+
+      document.cookie = `token=${res.access_token}; path=/;`;
+
+      dispatch(
+        setCredentials({
+          token: res.access_token,
+          user: { email },
+        })
+      );
+
+      router.push("/dashboard");
+    } catch {
+      alert("Invalid credentials");
+    }
     };
 
     return (

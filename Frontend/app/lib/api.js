@@ -5,7 +5,9 @@ export async function login(email, password) {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ email, password }),
+    
   });
+  console.log("The data is " +res);
 
   if (!res.ok) throw new Error("Invalid login");
 

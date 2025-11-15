@@ -8,8 +8,6 @@ from app.core.security import verify_password, hash_password, create_access_toke
 
 router = APIRouter(tags=["Auth"])
 
-router = APIRouter(tags=["Auth"])
-
 
 ## suru ma user_data :Usercreate run hunxa validate garxa post data haru thik xa ki naii vanerw ani db = Depends(get_db) dependecy injection database connection garna help garxa 
 @router.post("/register", response_model=UserResponse)
@@ -25,7 +23,7 @@ def register_user(user_data: UserCreate, db: Session = Depends(get_db)):
 
     # Create user
     new_user = User(
-        name=user_data.username,
+        username=user_data.username,
         email=user_data.email,
         password=hash_password(user_data.password),
     )

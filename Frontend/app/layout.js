@@ -5,7 +5,8 @@ import Lenis from "@studio-freight/lenis";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Navbar from "./components/layout/Navbar";
-
+import {Provider} from "react-redux";
+import { store } from "@/redux/store";
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -48,8 +49,10 @@ export default function RootLayout({ children }) {
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-white text-gray-900`}
       >
-       
+       <body>
+        <Provider store={store}>
         {children}
+        </Provider>
       </body>
     </html>
   );

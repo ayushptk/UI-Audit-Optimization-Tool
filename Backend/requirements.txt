@@ -6,4 +6,6 @@ psycopg2-binary
 pydantic[email]
 python-jose[cryptography]
 passlib[bcrypt]
-jwt
+PyJWT
+passlib[argon2]>=1.7.4
+argon2-cffi[fast]>=23.1.0

@@ -31,20 +31,20 @@ export default function Login() {
         e.preventDefault();
         console.log('Login data:', formData);
         try {
-      const res = await login(email, password);
+      const res = await login(formData.email, formData.password);
 
       document.cookie = `token=${res.access_token}; path=/;`;
 
       dispatch(
         setCredentials({
           token: res.access_token,
-          user: { email },
+          user: { email: formData.email },
         })
       );
 
       router.push("/dashboard");
-    } catch {
-      alert("Invalid credentials");
+    } catch (error) {
+      console.error("Login failed:", error);
     }
     };
 

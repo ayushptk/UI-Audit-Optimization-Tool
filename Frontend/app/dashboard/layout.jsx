@@ -108,7 +108,7 @@ export default function DashboardLayout({ children }) {
             </button>
 
             <div className="">
-             <Image src="/images/man.png" alt="UI Audit Logo" width={45} height={45} className="mb-2 w-9 h-9 bg-gray-300 rounded-full" />
+             <Image src="/images/manxa.png" alt="UI Audit Logo" width={45} height={45} className="mb-2 w-9 h-9 bg-gray-300 rounded-full" />
             </div>
           </div>
         </header>

@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.models.user import User
 from app.database import engine, Base
 from app.api.endpoints import auth
+from app.api.endpoints import upload
 
 app = FastAPI(title="UIaudit Backend API")
 Base.metadata.create_all(bind=engine)
@@ -14,9 +15,11 @@ app.add_middleware(
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
+    
 )
 
 app.include_router(auth.router, prefix="/auth")
+app.include_router(upload.router, prefix="/api")
 
 
 @app.get("/")

@@ -3,11 +3,18 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { FiEye, FiEyeOff, FiMail, FiLock, FiArrowRight, FiUser } from 'react-icons/fi';
+import { useDispatch } from 'react-redux';
+import { setCredentials } from "../../redux/authSlice";
+import { login, registerUser } from '../../lib/auth';
+import { useRouter } from "next/navigation";
 
 export default function Register() {
+    const dispatch = useDispatch();
+    const router = useRouter();
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const [formData, setFormData] = useState({
+        username: '',
         email: '',
         password: '',
         confirmPassword: '',
@@ -22,9 +29,40 @@ export default function Register() {
         }));
     };
 
-    const handleSubmit = (e) => {
+    async function handleSubmit(e) {
         e.preventDefault();
         console.log('Registration data:', formData);
+
+        // Password confirmation validation
+        if (formData.password !== formData.confirmPassword) {
+            alert('Passwords do not match');
+            return;
+        }
+
+        try {
+            // Register the user
+            await registerUser(formData.username, formData.email, formData.password);
+
+            // Automatically login after successful registration
+            const loginRes = await login(formData.email, formData.password);
+
+            // Set cookie
+            document.cookie = `token=${loginRes.access_token}; path=/;`;
+
+            // Dispatch to Redux
+            dispatch(
+                setCredentials({
+                    token: loginRes.access_token,
+                    user: loginRes.user,
+                })
+            );
+
+            // Redirect to dashboard
+            router.push("/dashboard");
+        } catch (error) {
+            console.error("Registration failed:", error);
+            alert("Registration failed. Please try again.");
+        }
     };
 
     return (
@@ -89,6 +127,28 @@ export default function Register() {
 
                             {/* Register Form */}
                             <form onSubmit={handleSubmit} className="space-y-6">
+                                {/* Username */}
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2" htmlFor="username">
+                                        Username <span className="text-red-500">*</span>
+                                    </label>
+                                    <div className="relative">
+                                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                            <FiUser className="h-5 w-5 text-gray-400" />
+                                        </div>
+                                        <input
+                                            id="username"
+                                            name="username"
+                                            type="text"
+                                            value={formData.username}
+                                            onChange={handleInputChange}
+                                            className="w-full pl-10 pr-3 py-3 border border-gray-200 rounded-xl focus:outline-none  transition-colors duration-200"
+                                            placeholder="Enter your username"
+                                            required
+                                        />
+                                    </div>
+                                </div>
+
                                 {/* Email */}
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-2" htmlFor="email">

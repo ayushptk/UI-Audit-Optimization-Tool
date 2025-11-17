@@ -5,7 +5,7 @@ import Link from "next/link";
 import { FiEye, FiEyeOff, FiMail, FiLock, FiArrowRight, FiUser } from 'react-icons/fi';
 import {useDispatch} from 'react-redux';
 import { setCredentials } from "../../redux/authSlice";
-import {login} from '../../lib/api';    
+import {login} from '../../lib/auth';    
 import { useRouter } from "next/navigation";
 
 export default function Login() {

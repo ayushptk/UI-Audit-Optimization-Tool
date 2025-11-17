@@ -2,6 +2,7 @@
 'use client';
 
 import { useState, useRef } from 'react';
+import { uploadFile } from '../../lib/upload';
 
 export default function UploadPage() {
   const [files, setFiles] = useState([]);
@@ -51,6 +52,49 @@ export default function UploadPage() {
       i++;
     }
     return `${b.toFixed(b < 10 ? 1 : 0)} ${units[i]}`;
+  };
+
+  const handleUpload = async () => {
+    if (!files) {
+      setError("Please select a file first.");
+      return;
+    }
+
+    const allowedTypes = [
+      "image/png",
+      "image/jpeg",
+      "image/jpg",
+      "image/svg+xml",
+      "application/octet-stream", // for .fig files
+    ];
+
+    if (!allowedTypes.includes(files.type) && !files.name.endsWith(".fig")) {
+      setError("File type not allowed. Please upload png, jpg, svg or fig files.");
+      return;
+    }
+
+    setError("");
+    setMessage("");
+    setProgress(0);
+
+    try {
+      const token = localStorage.getItem("access_token");
+
+      await uploadFile(files, token, (progressEvent) => {
+        const percentCompleted = Math.round(
+          (progressEvent.loaded * 100) / progressEvent.total
+        );
+        setProgress(percentCompleted);
+      });
+
+      setMessage("Upload successful!");
+      setFiles(null);
+      setProgress(0);
+      document.getElementById("fileInput").value = null;
+    } catch (err) {
+      setError(err.response?.data?.detail || "Upload failed.");
+      setProgress(0);
+    }
   };
 
   return (
@@ -191,10 +235,7 @@ export default function UploadPage() {
                 </button>
                 <button
                   type="button"
-                  onClick={() => {
-                   
-                    alert('Upload triggered (implement API call)');
-                  }}
+                   onClick={handleUpload}
                   disabled={files.length === 0}
                   className="rounded-lg bg-neutral-900 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-neutral-800 disabled:cursor-not-allowed disabled:bg-neutral-300"
                 >

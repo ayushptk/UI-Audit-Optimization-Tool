@@ -1,8 +1,13 @@
 import base64
-from openai import OpenAI
+import google.generativeai as genai
 from PIL import Image
 import os
-import io 
+import io
+from dotenv import load_dotenv
+
+
+load_dotenv()
+
 
 def extract_ai_description(file_path: str):
     """Convert UI image into text description for AI."""
@@ -14,25 +19,15 @@ def extract_ai_description(file_path: str):
     img.save(buffered, format="PNG")
     img_str = base64.b64encode(buffered.getvalue()).decode()
 
-    client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+    genai.configure()
+    model = genai.GenerativeModel('gemini-2.5-flash')
 
-    response = client.chat.completions.create(
-        model="gpt-4o-mini",
-        messages=[
-            {
-                "role": "user",
-                "content": [
-                    {"type": "text", "text": "Extract all visible text from this UI screenshot. Provide only the extracted text, nothing else."},
-                    {
-                        "type": "image_url",
-                        "image_url": {"url": f"data:image/png;base64,{img_str}"},
-                    },
-                ],
-            }
-        ],
-    )
+    response = model.generate_content([
+        "Extract all visible text from this UI screenshot. Provide only the extracted text, nothing else.",
+        {"mime_type": "image/png", "data": img_str}
+    ])
 
-    text = response.choices[0].message.content
+    text = response.text
 
     return f"""
     Screen size: {width}x{height}

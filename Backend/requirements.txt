@@ -10,4 +10,4 @@ PyJWT
 passlib[argon2]>=1.7.4
 argon2-cffi[fast]>=23.1.0
 colorthief
-openai>=1.0.0
+google-generativeai

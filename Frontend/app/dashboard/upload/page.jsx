@@ -5,21 +5,17 @@ import { useState, useRef } from 'react';
 import { uploadFile } from '../../lib/upload';
 
 export default function UploadPage() {
-  const [files, setFiles] = useState([]);
+  const [selectedFile, setSelectedFile] = useState(null);
   const [isDragging, setIsDragging] = useState(false);
+  const [error, setError] = useState("");
+  const [message, setMessage] = useState("");
+  const [progress, setProgress] = useState(0);
   const inputRef = useRef(null);
 
-
-  //it checked the duplication file or not if duplicated then it will not add
   const onFilesAdd = (incoming) => {
-    const list = Array.from(incoming);
-    const mapped = list.map((f) => ({
-      id: `${f.name}-${f.size}-${f.lastModified}`,
-      file: f,
-    }));
-    const existing = new Set(files.map((f) => f.id));
-    const merged = [...files, ...mapped.filter((m) => !existing.has(m.id))];
-    setFiles(merged);
+    if (incoming.length > 0) {
+      setSelectedFile(incoming[0]);
+    }
   };
 
   const handleDrop = (e) => {
@@ -38,10 +34,6 @@ export default function UploadPage() {
     }
   };
 
-  const removeFile = (id) => {
-    setFiles((prev) => prev.filter((f) => f.id !== id));
-  };
-
   const humanSize = (bytes) => {
     if (!bytes && bytes !== 0) return '';
     const units = ['B', 'KB', 'MB', 'GB'];
@@ -55,7 +47,7 @@ export default function UploadPage() {
   };
 
   const handleUpload = async () => {
-    if (!files) {
+    if (!selectedFile) {
       setError("Please select a file first.");
       return;
     }
@@ -68,7 +60,7 @@ export default function UploadPage() {
       "application/octet-stream", // for .fig files
     ];
 
-    if (!allowedTypes.includes(files.type) && !files.name.endsWith(".fig")) {
+    if (!allowedTypes.includes(selectedFile.type) && !selectedFile.name.endsWith(".fig")) {
       setError("File type not allowed. Please upload png, jpg, svg or fig files.");
       return;
     }
@@ -80,7 +72,7 @@ export default function UploadPage() {
     try {
       const token = localStorage.getItem("access_token");
 
-      await uploadFile(files, token, (progressEvent) => {
+      await uploadFile(selectedFile, token, (progressEvent) => {
         const percentCompleted = Math.round(
           (progressEvent.loaded * 100) / progressEvent.total
         );
@@ -88,7 +80,7 @@ export default function UploadPage() {
       });
 
       setMessage("Upload successful!");
-      setFiles(null);
+      setSelectedFile(null);
       setProgress(0);
       document.getElementById("fileInput").value = null;
     } catch (err) {
@@ -170,73 +162,67 @@ export default function UploadPage() {
               ref={inputRef}
               type="file"
               className="hidden"
-              multiple
               onChange={handleBrowse}
-              accept=".png,.jpg,.jpeg,.pdf"
+              accept=".png,.jpg,.jpeg,.pdf,.fig"
             />
           </div>
 
-          {files.length > 0 && (
+          {selectedFile && (
             <div className="mt-6">
               <div className="mb-2 text-sm font-medium text-neutral-900">
-                Selected files
+                Selected file
               </div>
-              <ul className="divide-y divide-neutral-200 rounded-xl border border-neutral-200 bg-white">
-                {files.map(({ id, file }) => (
-                  <li
-                    key={id}
-                    className="flex items-center justify-between gap-3 px-4 py-3"
-                  >
-                    <div className="flex min-w-0 items-center gap-3">
-                      <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-neutral-100">
-                        <span className="text-xs text-neutral-700">
-                          {file.type.startsWith('image') ? 'IMG' : file.type.includes('pdf') ? 'PDF' : 'FILE'}
-                        </span>
-                      </div>
-                      <div className="min-w-0">
-                        <p className="truncate text-sm font-medium text-neutral-900">
-                          {file.name}
-                        </p>
-                        <p className="text-xs text-neutral-500">
-                          {humanSize(file.size)}
-                        </p>
-                      </div>
+              <div className="divide-y divide-neutral-200 rounded-xl border border-neutral-200 bg-white">
+                <div className="flex items-center justify-between gap-3 px-4 py-3">
+                  <div className="flex min-w-0 items-center gap-3">
+                    <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-neutral-100">
+                      <span className="text-xs text-neutral-700">
+                        {selectedFile.type.startsWith('image') ? 'IMG' : selectedFile.type.includes('pdf') ? 'PDF' : 'FILE'}
+                      </span>
                     </div>
-                    <button
-                      type="button"
-                      onClick={() => removeFile(id)}
-                      className="rounded-full p-2 text-neutral-500 hover:bg-neutral-100 hover:text-neutral-700"
-                      aria-label={`Remove ${file.name}`}
+                    <div className="min-w-0">
+                      <p className="truncate text-sm font-medium text-neutral-900">
+                        {selectedFile.name}
+                      </p>
+                      <p className="text-xs text-neutral-500">
+                        {humanSize(selectedFile.size)}
+                      </p>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setSelectedFile(null)}
+                    className="rounded-full p-2 text-neutral-500 hover:bg-neutral-100 hover:text-neutral-700"
+                    aria-label={`Remove ${selectedFile.name}`}
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-4 w-4"
+                      viewBox="0 0 20 20"
+                      fill="currentColor"
                     >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="h-4 w-4"
-                        viewBox="0 0 20 20"
-                        fill="currentColor"
-                      >
-                        <path
-                          fillRule="evenodd"
-                          d="M10 18a8 8 0 100-16 8 8 0 000 16zm2.828-10.828a.75.75 0 00-1.06-1.06L10 7.94 8.232 6.172a.75.75 0 10-1.06 1.06L8.94 9l-1.768 1.768a.75.75 0 101.06 1.06L10 10.06l1.768 1.768a.75.75 0 101.06-1.06L11.06 9l1.768-1.768z"
-                          clipRule="evenodd"
-                        />
-                      </svg>
-                    </button>
-                  </li>
-                ))}
-              </ul>
+                      <path
+                        fillRule="evenodd"
+                        d="M10 18a8 8 0 100-16 8 8 0 000 16zm2.828-10.828a.75.75 0 00-1.06-1.06L10 7.94 8.232 6.172a.75.75 0 10-1.06 1.06L8.94 9l-1.768 1.768a.75.75 0 101.06 1.06L10 10.06l1.768 1.768a.75.75 0 101.06-1.06L11.06 9l1.768-1.768z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                  </button>
+                </div>
+              </div>
 
               <div className="mt-4 flex items-center justify-end gap-3">
                 <button
                   type="button"
-                  onClick={() => setFiles([])}
+                  onClick={() => setSelectedFile(null)}
                   className="rounded-lg border border-neutral-300 bg-white px-4 py-2 text-sm font-medium text-neutral-700 hover:bg-neutral-50"
                 >
                   Clear
                 </button>
                 <button
                   type="button"
-                   onClick={handleUpload}
-                  disabled={files.length === 0}
+                  onClick={handleUpload}
+                  disabled={!selectedFile}
                   className="rounded-lg bg-neutral-900 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-neutral-800 disabled:cursor-not-allowed disabled:bg-neutral-300"
                 >
                   Upload

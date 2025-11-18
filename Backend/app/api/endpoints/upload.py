@@ -1,3 +1,4 @@
+import os
 from fastapi import APIRouter, UploadFile, File, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 
@@ -12,6 +13,9 @@ async def upload_design(file: UploadFile = File(...), token: str = Depends(oauth
     filename = file.filename.lower()
     if not any(filename.endswith(ext) for ext in allowed_extensions):
         raise HTTPException(status_code=400, detail="File type not allowed")
+
+    # Ensure uploads directory exists
+    os.makedirs("./uploads", exist_ok=True)
 
     # Save uploaded file
     file_location = f"./uploads/{file.filename}"

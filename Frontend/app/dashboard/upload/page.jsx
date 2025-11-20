@@ -2,9 +2,12 @@
 'use client';
 
 import { useState, useRef } from 'react';
+import { useRouter } from 'next/navigation';
 import { uploadFile } from '../../lib/upload';
+import { analyzeFile } from '../../lib/analyze';
 
 export default function UploadPage() {
+  const router = useRouter();
   const [selectedFile, setSelectedFile] = useState(null);
   const [isDragging, setIsDragging] = useState(false);
   const [error, setError] = useState("");
@@ -72,19 +75,32 @@ export default function UploadPage() {
     try {
       const token = localStorage.getItem("access_token");
 
-      await uploadFile(selectedFile, token, (progressEvent) => {
+      // Upload file
+      const uploadResponse = await uploadFile(selectedFile, token, (progressEvent) => {
         const percentCompleted = Math.round(
           (progressEvent.loaded * 100) / progressEvent.total
         );
         setProgress(percentCompleted);
       });
 
-      setMessage("Upload successful!");
+      // Analyze the uploaded file
+      await analyzeFile(uploadResponse.filename, token);
+      console.log("File uploaded and analyzed successfully.");
+      setMessage("Upload and analysis successful!");
       setSelectedFile(null);
       setProgress(0);
-      document.getElementById("fileInput").value = null;
+      if (inputRef.current) {
+        inputRef.current.value = '';
+      }
+
+      // Navigate to reports page with dynamic id
+      const reportId = uploadResponse.id || '1'; // Use id from response or default to '1'
+      router.push(`/dashboard/reports/${reportId}`);
+      console.log("Navigated to reports page.");
     } catch (err) {
-      setError(err.response?.data?.detail || "Upload failed.");
+      console.error(err);
+      setError(err.response?.data?.detail || "Upload or analysis failed.");
+      console.log("Navigated to reports page error page.");
       setProgress(0);
     }
   };

@@ -1,29 +1,54 @@
-import os
-from fastapi import APIRouter, UploadFile, File, Depends, HTTPException, status
+from fastapi import APIRouter, UploadFile, File, Depends, HTTPException, status, Response
 from fastapi.security import OAuth2PasswordBearer
+from sqlalchemy.orm import Session
+from app.database import get_db
+from app.models.design import Design
+from app.api.dependencies import get_current_user
+from app.models.user import User
+from app.schema.design import DesignResponse
 
 router = APIRouter()
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/login")
 
-@router.post("/upload")
-async def upload_design(file: UploadFile = File(...), token: str = Depends(oauth2_scheme)):
+@router.post("/upload", response_model=DesignResponse)
+async def upload_design(
+    file: UploadFile = File(...),
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
     # Check file type validation (optional)
     allowed_extensions = [".fig", ".png", ".jpg", ".jpeg", ".svg"]
     filename = file.filename.lower()
     if not any(filename.endswith(ext) for ext in allowed_extensions):
         raise HTTPException(status_code=400, detail="File type not allowed")
 
-    # Ensure uploads directory exists
-    os.makedirs("./uploads", exist_ok=True)
+    # Read file content
+    content = await file.read()
 
-    # Save uploaded file
-    file_location = f"./uploads/{file.filename}"
-    try:
-        with open(file_location, "wb") as buffer:
-            content = await file.read()
-            buffer.write(content)
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to save file: {e}")
+    # Create Design instance and save to DB
+    design = Design(
+        filename=file.filename,          # <-- this is required!
+        content=content,
+        content_type=file.content_type,
+        user_id=current_user.id,
+        is_processed=False
+    )
+    db.add(design)
+    db.commit()
+    db.refresh(design)
 
-    return {"filename": file.filename, "message": "File uploaded successfully"}
+    return design
+
+
+@router.get("/design/{design_id}")
+async def get_design_image(
+    design_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    design = db.query(Design).filter(Design.id == design_id, Design.user_id == current_user.id).first()
+    if not design:
+        raise HTTPException(status_code=404, detail="Design not found")
+
+    return Response(content=design.content, media_type=design.content_type or "application/octet-stream")

@@ -1,8 +1,7 @@
-# TODO: Fix params Promise error in Next.js dynamic route
+# TODO: Save Uploaded Designs to Database
 
-## Tasks
-- [ ] Fix params handling in `Frontend/app/dashboard/reports/[id]/page.jsx`: Await `params` and destructure `id`
-- [ ] Remove incorrect `params` from `Frontend/app/dashboard/reports/page.jsx` function signature
-- [ ] Update `router.push` in `Frontend/app/dashboard/upload/page.jsx` to use dynamic id from upload/analyze response instead of hardcoded '1'
-- [ ] Test navigation to reports page after upload
-- [ ] Verify no more params Promise errors
+- [ ] Create Backend/app/schema/design.py with Pydantic models for Design
+- [ ] Modify Backend/app/api/endpoints/upload.py to save file data to database instead of local folder
+- [ ] Create an endpoint to fetch image from database
+- [ ] Update any dependent files if necessary
+- [ ] Test the upload and fetch functionality

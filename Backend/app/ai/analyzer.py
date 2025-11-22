@@ -32,4 +32,4 @@ def extract_ai_description(file_path: str):
     return f"""
     Screen size: {width}x{height}
     Extracted text: {text}
-    """
+    """ 

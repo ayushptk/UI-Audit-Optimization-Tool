@@ -27,4 +27,5 @@ app.include_router(analyzeai_router, prefix="/api")
 
 @app.get("/")
 def root():
+    
     return {"message": "Welcome to UIaudit API"}

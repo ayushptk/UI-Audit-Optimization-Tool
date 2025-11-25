@@ -1,7 +1,7 @@
-// JavaScript
-// app/dashboard/reports/page.jsx
-import fs from "fs";
-import path from "path";
+"use client";
+
+import React, { useEffect, useState } from "react";
+import Link from "next/link";
 
 function Badge({ tone = "neutral", children }) {
   const tones = {
@@ -64,23 +64,43 @@ function Empty() {
   );
 }
 
-export default async function ReportsOverviewPage() {
-  // Example: read a list file with many reports.
-  // If you don't have it yet, keep a placeholder array and wire up later.
-  const listPath = path.join(process.cwd(), "app", "reports.json");
-  let reports = [];
-  try {
-    const raw = fs.readFileSync(listPath, "utf-8");
-    const parsed = JSON.parse(raw);
-    if (Array.isArray(parsed)) reports = parsed;
-  } catch {
-    // Placeholder demo data
-    reports = [
-      { id: "R-1042", title: "UI Audit — Marketing Site", date: new Date().toISOString(), score: 87, totals: { good: 24, issues: 5, suggestions: 12 } },
-      { id: "R-1041", title: "UI Audit — Dashboard", date: new Date(Date.now() - 86400000).toISOString(), score: 78, totals: { good: 19, issues: 9, suggestions: 14 } },
-      { id: "R-1040", title: "UI Audit — Auth Flows", date: new Date(Date.now() - 2*86400000).toISOString(), score: 65, totals: { good: 12, issues: 15, suggestions: 9 } },
-    ];
-  }
+export default function ReportsOverviewPage() {
+  const [reports, setReports] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    async function fetchReports() {
+      setLoading(true);
+      setError(null);
+      try {
+        const token = typeof window !== "undefined" ? localStorage.getItem("access_token") : null;
+        const res = await fetch("http://localhost:8000/api/designs", {
+          headers: token ? { Authorization: `Bearer ${token}` } : {},
+        });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
+        // Normalize entries to the shape used by the UI
+        const normalized = (Array.isArray(data) ? data : []).map((d) => ({
+          id: String(d.id),
+          title: d.filename || `Report ${d.id}`,
+          date: d.uploaded_at || null,
+          score: d.analysis_result?.score ?? null,
+          totals: {
+            good: d.analysis_result?.good?.length ?? 0,
+            issues: d.analysis_result?.issues?.length ?? 0,
+            suggestions: d.analysis_result?.suggestions?.length ?? 0,
+          },
+        }));
+        setReports(normalized);
+      } catch (err) {
+        setError(err.message || String(err));
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchReports();
+  }, []);
 
   // Aggregate
   const count = reports.length;
@@ -102,9 +122,11 @@ export default async function ReportsOverviewPage() {
             <button className="rounded-lg border border-neutral-200 bg-white px-3.5 py-2 text-sm font-medium text-neutral-700 hover:bg-neutral-50">
               Export Summary
             </button>
-            <button className="rounded-lg bg-neutral-900 px-3.5 py-2 text-sm font-medium text-white hover:bg-black">
-              New Audit
-            </button>
+            <Link href="/dashboard/upload">
+              <button className="rounded-lg bg-neutral-900 px-3.5 py-2 text-sm font-medium text-white hover:bg-black">
+                New Audit
+              </button>
+            </Link>
           </div>
         </div>
 
@@ -136,7 +158,11 @@ export default async function ReportsOverviewPage() {
             </div>
           }
         >
-          {reports.length === 0 ? (
+          {loading ? (
+            <div className="rounded-2xl border border-dashed border-neutral-200 bg-white p-8 text-center text-sm text-neutral-500">Loading reports…</div>
+          ) : error ? (
+            <div className="rounded-2xl border border-dashed border-neutral-200 bg-white p-8 text-center text-sm text-rose-600">Error: {error}</div>
+          ) : reports.length === 0 ? (
             <Empty />
           ) : (
             <ul className="divide-y divide-neutral-100">
@@ -144,9 +170,9 @@ export default async function ReportsOverviewPage() {
                 <li key={r.id} className="flex flex-col gap-3 py-4 md:flex-row md:items-center md:justify-between">
                   <div className="min-w-0">
                     <div className="flex items-center gap-2">
-                      <a href={`/dashboard/reports/${encodeURIComponent(r.id)}`} className="truncate text-sm font-medium text-neutral-900 hover:underline">
+                      <Link href={`/dashboard/reports/${encodeURIComponent(r.id)}`} className="truncate text-sm font-medium text-neutral-900 hover:underline">
                         {r.title || `Report ${r.id}`}
-                      </a>
+                      </Link>
                       <Badge tone="neutral">{r.id}</Badge>
                     </div>
                     <div className="mt-1 flex flex-wrap items-center gap-3 text-xs text-neutral-500">
@@ -161,12 +187,9 @@ export default async function ReportsOverviewPage() {
                   </div>
                   <div className="flex items-center gap-3">
                     <ScorePill score={r.score} />
-                    <a
-                      href={`/dashboard/reports/${encodeURIComponent(r.id)}`}
-                      className="rounded-lg border border-neutral-200 bg-white px-3 py-1.5 text-sm font-medium text-neutral-700 hover:bg-neutral-50"
-                    >
+                    <Link href={`/dashboard/reports/${encodeURIComponent(r.id)}`} className="rounded-lg border border-neutral-200 bg-white px-3 py-1.5 text-sm font-medium text-neutral-700 hover:bg-neutral-50">
                       View
-                    </a>
+                    </Link>
                   </div>
                 </li>
               ))}

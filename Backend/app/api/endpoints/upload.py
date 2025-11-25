@@ -6,6 +6,7 @@ from app.models.design import Design
 from app.api.dependencies import get_current_user
 from app.models.user import User
 from app.schema.design import DesignResponse
+import json
 
 router = APIRouter()
 
@@ -39,6 +40,34 @@ async def upload_design(
     db.refresh(design)
 
     return design
+
+
+@router.get("/designs")
+async def list_designs(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """Return a list of designs (reports) for the current user."""
+    designs = db.query(Design).filter(Design.user_id == current_user.id).order_by(Design.uploaded_at.desc()).all()
+    results = []
+    for d in designs:
+        # Try to parse analysis_result as JSON, otherwise return as raw string
+        analysis = None
+        if d.analysis_result:
+            try:
+                analysis = json.loads(d.analysis_result)
+            except Exception:
+                analysis = d.analysis_result
+
+        results.append({
+            "id": d.id,
+            "filename": d.filename,
+            "is_processed": bool(d.is_processed),
+            "uploaded_at": d.uploaded_at.isoformat() if d.uploaded_at is not None else None,
+            "analysis_result": analysis,
+        })
+
+    return results
 
 
 @router.get("/design/{design_id}")

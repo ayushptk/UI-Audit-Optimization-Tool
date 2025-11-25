@@ -1,33 +1,14 @@
 // JavaScript
-// Frontend/app/dashboard/reports/[id]/page.jsx
+// app/dashboard/reports/page.jsx
 import fs from "fs";
 import path from "path";
-import { SlBadge } from "react-icons/sl";
 
-// Robust parser for ai_analysis: supports object, plain JSON string, and fenced ```json blocks.
-function parseAiAnalysis(raw) {
-  if (!raw) return null;
-  if (typeof raw === "object") return raw;
-
-  if (typeof raw === "string") {
-    const fenceRegex = /```(?:json)?\s*([\s\S]*?)\s*```/i;
-    const match = raw.match(fenceRegex);
-    const jsonStr = match ? match[1] : raw;
-    try {
-      return JSON.parse(jsonStr);
-    } catch {
-      return null;
-    }
-  }
-  return null;
-}
-
-function Badge({ children, tone = "neutral" }) {
+function Badge({ tone = "neutral", children }) {
   const tones = {
     neutral: "bg-neutral-100 text-neutral-700 ring-1 ring-neutral-200",
     good: "bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200",
     issue: "bg-rose-50 text-rose-700 ring-1 ring-rose-200",
-    suggestion: "bg-indigo-50 text-indigo-700 ring-1 ring-indigo-200",
+    warning: "bg-amber-50 text-amber-700 ring-1 ring-amber-200",
   };
   return (
     <span className={`inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ${tones[tone]}`}>
@@ -36,209 +17,167 @@ function Badge({ children, tone = "neutral" }) {
   );
 }
 
-function KpiCard({ label, value, tone = "neutral" }) {
-  const tones = {
+function Kpi({ label, value, hint, tone = "neutral" }) {
+  const border = {
     neutral: "border-neutral-200",
     emerald: "border-emerald-200",
     rose: "border-rose-200",
     indigo: "border-indigo-200",
-  };
+    amber: "border-amber-200",
+  }[tone];
   return (
-    <div className={`rounded-xl border ${tones[tone]} bg-white p-4 shadow-sm`}>
+    <div className={`rounded-2xl border ${border} bg-white p-5 shadow-sm`}>
       <div className="text-xs text-neutral-500">{label}</div>
-      <div className="mt-1 text-xl font-semibold text-neutral-900">{value}</div>
+      <div className="mt-1 text-2xl font-semibold text-neutral-900">{value}</div>
+      {hint && <div className="mt-1 text-xs text-neutral-500">{hint}</div>}
     </div>
   );
 }
 
-function Dot({ tone }) {
-  const map = {
-    good: "bg-emerald-500",
-    issue: "bg-rose-500",
-    suggestion: "bg-indigo-500",
-    neutral: "bg-neutral-300",
-  };
-  return <span className={`mt-2 h-2 w-2 rounded-full ${map[tone]}`} />;
+function ScorePill({ score }) {
+  const s = Math.max(0, Math.min(100, Number(score) || 0));
+  const tone = s >= 85 ? "text-emerald-600 bg-emerald-50 ring-emerald-200" : s >= 70 ? "text-amber-600 bg-amber-50 ring-amber-200" : "text-rose-600 bg-rose-50 ring-rose-200";
+  return (
+    <span className={`inline-flex items-center rounded-full px-2.5 py-1 text-xs font-medium ring-1 ${tone}`}>
+      {s}/100
+    </span>
+  );
 }
 
-function ListSection({ title, items, tone }) {
-  if (!items?.length) return null;
+function Section({ title, right, children }) {
   return (
-    <section className="rounded-xl border border-neutral-200 bg-white p-5 shadow-sm">
-      <div className="mb-4 flex items-center gap-3">
-        <h2 className="text-lg font-semibold text-neutral-900">{title}</h2>
-        <Badge tone={tone}>{tone === "good" ? "Good" : title}</Badge>
+    <section className="rounded-2xl border border-neutral-200 bg-white p-5 shadow-sm">
+      <div className="mb-3 flex items-center justify-between">
+        <h2 className="text-base font-semibold text-neutral-900">{title}</h2>
+        {right}
       </div>
-      <ul className="space-y-3">
-        {items.map((text, idx) => (
-          <li key={idx} className="flex gap-3">
-            <Dot tone={tone} />
-            <p className="text-sm leading-6 text-neutral-800">{String(text)}</p>
-          </li>
-        ))}
-      </ul>
+      {children}
     </section>
   );
 }
 
-function ScoreRing({ score = 0 }) {
-  // Simple ring visualization
-  const clamped = Math.max(0, Math.min(100, Number(score) || 0));
-  const dash = 283; // circumference for r=45 (approx)
-  const offset = dash - (dash * clamped) / 100;
-  const tone =
-    clamped >= 85 ? "text-emerald-500" : clamped >= 70 ? "text-amber-500" : "text-rose-500";
-
+function Empty() {
   return (
-    <div className="relative h-24 w-24">
-      <svg viewBox="0 0 100 100" className="h-24 w-24 -rotate-90">
-        <circle cx="50" cy="50" r="45" className="stroke-neutral-200" strokeWidth="8" fill="none" />
-        <circle
-          cx="50"
-          cy="50"
-          r="45"
-          className={`${tone}`}
-          stroke="currentColor"
-          strokeWidth="8"
-          fill="none"
-          strokeDasharray={dash}
-          strokeDashoffset={offset}
-          strokeLinecap="round"
-        />
-      </svg>
-      <div className="absolute inset-0 rotate-90 flex items-center justify-center">
-        <div className="text-center">
-          <div className="text-lg font-semibold text-neutral-900">{clamped}</div>
-          <div className="text-[10px] text-neutral-500">Score</div>
-        </div>
-      </div>
+    <div className="rounded-2xl border border-dashed border-neutral-200 bg-white p-8 text-center text-sm text-neutral-500">
+      No reports yet. Generate your first audit to see insights here.
     </div>
   );
 }
 
-export default async function ReportDetailPage() {
-  // Read app/output.json from the Next.js project root (Frontend)
-  const filePath = path.join(process.cwd(), "app", "output.json");
-
-  let content = null;
-  let analysis = { good: [], issues: [], suggestions: [] };
-  let meta = { name: "Untitled Report", date: null, id: "" };
-  let score = 0;
-
+export default async function ReportsOverviewPage() {
+  // Example: read a list file with many reports.
+  // If you don't have it yet, keep a placeholder array and wire up later.
+  const listPath = path.join(process.cwd(), "app", "reports.json");
+  let reports = [];
   try {
-    const raw = fs.readFileSync(filePath, "utf-8");
-    content = JSON.parse(raw);
-
-    // Flexible keys support; adjust here to your actual file keys
-    // Example optional keys: title/name, created_at/date, score
-    meta = {
-      name: content?.title || content?.name || "UI Audit Report",
-      date: content?.created_at || content?.date || null,
-      id: "",
-    };
-    score = Number(content?.score ?? 0);
-
-    const candidate = content?.ai_analysis ?? content?.analysis ?? content?.result ?? null;
-    const parsed = parseAiAnalysis(candidate);
-    if (parsed && typeof parsed === "object") {
-      analysis = {
-        good: Array.isArray(parsed.good) ? parsed.good : [],
-        issues: Array.isArray(parsed.issues) ? parsed.issues : [],
-        suggestions: Array.isArray(parsed.suggestions) ? parsed.suggestions : [],
-      };
-    }
+    const raw = fs.readFileSync(listPath, "utf-8");
+    const parsed = JSON.parse(raw);
+    if (Array.isArray(parsed)) reports = parsed;
   } catch {
-    // keep defaults
+    // Placeholder demo data
+    reports = [
+      { id: "R-1042", title: "UI Audit — Marketing Site", date: new Date().toISOString(), score: 87, totals: { good: 24, issues: 5, suggestions: 12 } },
+      { id: "R-1041", title: "UI Audit — Dashboard", date: new Date(Date.now() - 86400000).toISOString(), score: 78, totals: { good: 19, issues: 9, suggestions: 14 } },
+      { id: "R-1040", title: "UI Audit — Auth Flows", date: new Date(Date.now() - 2*86400000).toISOString(), score: 65, totals: { good: 12, issues: 15, suggestions: 9 } },
+    ];
   }
 
-  const totals = {
-    good: analysis.good.length,
-    issues: analysis.issues.length,
-    suggestions: analysis.suggestions.length,
-  };
+  // Aggregate
+  const count = reports.length;
+  const avgScore = count ? Math.round(reports.reduce((a, r) => a + (Number(r.score) || 0), 0) / count) : 0;
+  const totalGood = reports.reduce((a, r) => a + (r.totals?.good || 0), 0);
+  const totalIssues = reports.reduce((a, r) => a + (r.totals?.issues || 0), 0);
+  const totalSuggestions = reports.reduce((a, r) => a + (r.totals?.suggestions || 0), 0);
 
   return (
-    <div className="min-h-screen bg-neutral-50">
+    <div className="min-h-screen ">
       <div className="mx-auto w-full max-w-7xl px-4 py-8 md:py-10">
-        {/* Hero */}
-        <div className="mb-8 flex flex-col gap-6 rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm md:flex-row md:items-center md:justify-between">
-          <div className="flex items-center gap-6">
-            <ScoreRing score={score} />
-            <div>
-              <h1 className="text-2xl font-bold tracking-tight text-neutral-900">{meta.name}</h1>
-              <div className="mt-1 flex flex-wrap items-center gap-2 text-sm text-neutral-600">
-                <Badge>Report #{meta.id}</Badge>
-                {meta.date && (
-                  <span className="text-neutral-500">
-                    {new Date(meta.date).toLocaleString()}
-                  </span>
-                )}
-              </div>
-            </div>
+        {/* Header */}
+        <div className="mb-8 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+          <div>
+            <h1 className="text-2xl font-bold tracking-tight text-neutral-900">Reports</h1>
+            <p className="mt-1 text-sm text-neutral-600">Overview of all generated audits across your project.</p>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex gap-2">
             <button className="rounded-lg border border-neutral-200 bg-white px-3.5 py-2 text-sm font-medium text-neutral-700 hover:bg-neutral-50">
-              Share
+              Export Summary
             </button>
             <button className="rounded-lg bg-neutral-900 px-3.5 py-2 text-sm font-medium text-white hover:bg-black">
-              Export PDF
+              New Audit
             </button>
           </div>
         </div>
 
         {/* KPIs */}
-        <div className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-3">
-          <KpiCard label="Highlights" value={totals.good} tone="emerald" />
-          <KpiCard label="Issues" value={totals.issues} tone="rose" />
-          <KpiCard label="Suggestions" value={totals.suggestions} tone="indigo" />
+        <div className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <Kpi label="Reports" value={count} hint="Total generated" tone="neutral" />
+          <Kpi label="Average Score" value={`${avgScore}/100`} hint="Across all reports" tone="amber" />
+          <Kpi label="Highlights" value={totalGood} hint="Positive findings" tone="emerald" />
+          <Kpi label="Issues" value={totalIssues} hint="Needs attention" tone="rose" />
         </div>
 
-        {/* Main Content */}
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-          {/* Left: Issues + Suggestions */}
-          <div className="lg:col-span-2 space-y-6">
-            <ListSection title="Top Issues" items={analysis.issues} tone="issue" />
-            <ListSection title="Suggestions" items={analysis.suggestions} tone="suggestion" />
-          </div>
+        {/* Filters + List */}
+        <Section
+          title="All Reports"
+          right={
+            <div className="flex items-center gap-2">
+              <select className="rounded-lg border border-neutral-200 bg-white px-2.5 py-1.5 text-sm text-neutral-700">
+                <option>Sort: Newest</option>
+                <option>Sort: Oldest</option>
+                <option>Sort: Highest Score</option>
+                <option>Sort: Lowest Score</option>
+              </select>
+              <select className="rounded-lg border border-neutral-200 bg-white px-2.5 py-1.5 text-sm text-neutral-700">
+                <option>Filter: All</option>
+                <option>Score ≥ 85</option>
+                <option>Score 70–84</option>
+                <option>Score &lt; 70</option>
+              </select>
+            </div>
+          }
+        >
+          {reports.length === 0 ? (
+            <Empty />
+          ) : (
+            <ul className="divide-y divide-neutral-100">
+              {reports.map((r) => (
+                <li key={r.id} className="flex flex-col gap-3 py-4 md:flex-row md:items-center md:justify-between">
+                  <div className="min-w-0">
+                    <div className="flex items-center gap-2">
+                      <a href={`/dashboard/reports/${encodeURIComponent(r.id)}`} className="truncate text-sm font-medium text-neutral-900 hover:underline">
+                        {r.title || `Report ${r.id}`}
+                      </a>
+                      <Badge tone="neutral">{r.id}</Badge>
+                    </div>
+                    <div className="mt-1 flex flex-wrap items-center gap-3 text-xs text-neutral-500">
+                      <span>{r.date ? new Date(r.date).toLocaleString() : "—"}</span>
+                      <span className="hidden md:inline text-neutral-300">•</span>
+                      <span className="flex items-center gap-2">
+                        <Badge tone="good">Good: {r.totals?.good ?? 0}</Badge>
+                        <Badge tone="issue">Issues: {r.totals?.issues ?? 0}</Badge>
+                        <Badge tone="warning">Suggestions: {r.totals?.suggestions ?? 0}</Badge>
+                      </span>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <ScorePill score={r.score} />
+                    <a
+                      href={`/dashboard/reports/${encodeURIComponent(r.id)}`}
+                      className="rounded-lg border border-neutral-200 bg-white px-3 py-1.5 text-sm font-medium text-neutral-700 hover:bg-neutral-50"
+                    >
+                      View
+                    </a>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          )}
+        </Section>
 
-          {/* Right: Highlights + Meta */}
-          <div className="lg:col-span-1 space-y-6">
-            <ListSection title="What’s Good" items={analysis.good} tone="good" />
-            <section className="rounded-xl border border-neutral-200 bg-white p-5 shadow-sm">
-              <h3 className="mb-3 text-base font-semibold text-neutral-900">Report Details</h3>
-              <dl className="space-y-2 text-sm">
-                <div className="flex items-center justify-between">
-                  <dt className="text-neutral-500">Report ID</dt>
-                  <dd className="text-neutral-800">{meta.id}</dd>
-                </div>
-                <div className="flex items-center justify-between">
-                  <dt className="text-neutral-500">Generated At</dt>
-                  <dd className="text-neutral-800">
-                    {meta.date ? new Date(meta.date).toLocaleString() : "—"}
-                  </dd>
-                </div>
-                <div className="flex items-center justify-between">
-                  <dt className="text-neutral-500">Score</dt>
-                  <dd className="text-neutral-800">{Number(score) || 0}/100</dd>
-                </div>
-              </dl>
-            </section>
+      
 
-            {/* Optional raw preview for debugging (collapse) */}
-            <details className="rounded-xl border border-neutral-200 bg-white p-5 shadow-sm">
-              <summary className="cursor-pointer text-sm font-medium text-neutral-800">
-                Raw JSON (debug)
-              </summary>
-              <pre className="mt-3 max-h-64 overflow-auto whitespace-pre-wrap text-xs text-neutral-700">
-                {JSON.stringify(content ?? {}, null, 2)}
-              </pre>
-            </details>
-          </div>
-        </div>
-
-        {/* Footer */}
         <div className="mt-10 text-center text-xs text-neutral-500">
-          Generated by UIaudit • Validate with user testing for best results
+          UIaudit — Overall report summary
         </div>
       </div>
     </div>

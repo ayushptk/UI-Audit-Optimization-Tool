@@ -16,3 +16,21 @@ export async function analyzeDesignById(designId, authToken) {
   }
   return response.json();
 }
+
+// New function to analyze file by filename and authToken
+export async function analyzeFile(filename, authToken) {
+  const response = await fetch(`${BASE_URL}/file`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${authToken}`,
+    },
+    body: JSON.stringify({ filename }),
+  });
+
+  if (!response.ok) {
+    const text = await response.text();
+    throw new Error(`HTTP ${response.status}: ${text}`);
+  }
+  return response.json();
+}

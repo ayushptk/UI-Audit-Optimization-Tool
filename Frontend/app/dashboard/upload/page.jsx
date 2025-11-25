@@ -4,7 +4,7 @@
 import { useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { uploadFile } from '../../lib/upload';
-import { analyzeFile } from '../../lib/analyze';
+import { analyzeDesignById } from '../../lib/analyze';
 
 export default function UploadPage() {
   const router = useRouter();
@@ -83,8 +83,8 @@ export default function UploadPage() {
         setProgress(percentCompleted);
       });
 
-      // Analyze the uploaded file
-      await analyzeFile(uploadResponse.filename, token);
+      // Analyze the uploaded file by design id
+      await analyzeDesignById(uploadResponse.id, token);
       console.log("File uploaded and analyzed successfully.");
       setMessage("Upload and analysis successful!");
       setSelectedFile(null);

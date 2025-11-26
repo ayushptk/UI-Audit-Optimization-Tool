@@ -54,10 +54,29 @@ async def list_designs(
         # Try to parse analysis_result as JSON, otherwise return as raw string
         analysis = None
         if d.analysis_result:
-            try:
-                analysis = json.loads(d.analysis_result)
-            except Exception:
-                analysis = d.analysis_result
+            raw = d.analysis_result
+            # If the AI returned a fenced JSON block or extra text, try to extract the JSON object
+            if isinstance(raw, str):
+                # Attempt to find a JSON object inside the string by locating the first '{' and last '}'
+                start = raw.find('{')
+                end = raw.rfind('}')
+                if start != -1 and end != -1 and end > start:
+                    candidate = raw[start : end + 1]
+                    try:
+                        analysis = json.loads(candidate)
+                    except Exception:
+                        # fallback to trying the whole string
+                        try:
+                            analysis = json.loads(raw)
+                        except Exception:
+                            analysis = raw
+                else:
+                    try:
+                        analysis = json.loads(raw)
+                    except Exception:
+                        analysis = raw
+            else:
+                analysis = raw
 
         results.append({
             "id": d.id,

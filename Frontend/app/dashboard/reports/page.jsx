@@ -81,17 +81,62 @@ export default function ReportsOverviewPage() {
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const data = await res.json();
         // Normalize entries to the shape used by the UI
-        const normalized = (Array.isArray(data) ? data : []).map((d) => ({
-          id: String(d.id),
-          title: d.filename || `Report ${d.id}`,
-          date: d.uploaded_at || null,
-          score: d.analysis_result?.score ?? null,
-          totals: {
-            good: d.analysis_result?.good?.length ?? 0,
-            issues: d.analysis_result?.issues?.length ?? 0,
-            suggestions: d.analysis_result?.suggestions?.length ?? 0,
-          },
-        }));
+        const normalized = (Array.isArray(data) ? data : []).map((d) => {
+          const analysisRaw = d.analysis_result;
+
+          // Try to ensure we have an object for analysis_result. If it's a string
+          // attempt to extract JSON from it (handles code-fenced AI responses).
+          let analysis = analysisRaw;
+          if (typeof analysisRaw === "string") {
+            const start = analysisRaw.indexOf("{");
+            const end = analysisRaw.lastIndexOf("}");
+            if (start !== -1 && end !== -1 && end > start) {
+              const candidate = analysisRaw.slice(start, end + 1);
+              try {
+                analysis = JSON.parse(candidate);
+              } catch (e) {
+                try {
+                  analysis = JSON.parse(analysisRaw);
+                } catch (e2) {
+                  analysis = null;
+                }
+              }
+            } else {
+              try {
+                analysis = JSON.parse(analysisRaw);
+              } catch (e) {
+                analysis = null;
+              }
+            }
+          }
+
+          const goodCount = Array.isArray(analysis?.good) ? analysis.good.length : typeof analysis?.good === "number" ? analysis.good : 0;
+          const issuesCount = Array.isArray(analysis?.issues) ? analysis.issues.length : typeof analysis?.issues === "number" ? analysis.issues : 0;
+          const suggestionsCount = Array.isArray(analysis?.suggestions) ? analysis.suggestions.length : typeof analysis?.suggestions === "number" ? analysis.suggestions : 0;
+
+          // Compute a fallback score when score is missing: proportion of goods to total findings
+          let scoreValue = null;
+          if (analysis && typeof analysis.score === "number") {
+            scoreValue = analysis.score;
+          } else if (analysis && typeof analysis.score === "string" && !isNaN(Number(analysis.score))) {
+            scoreValue = Number(analysis.score);
+          } else {
+            const totalFindings = goodCount + issuesCount + suggestionsCount;
+            scoreValue = totalFindings > 0 ? Math.round((goodCount / totalFindings) * 100) : null;
+          }
+
+          return {
+            id: String(d.id),
+            title: d.filename || `Report ${d.id}`,
+            date: d.uploaded_at || null,
+            score: scoreValue,
+            totals: {
+              good: goodCount,
+              issues: issuesCount,
+              suggestions: suggestionsCount,
+            },
+          };
+        });
         setReports(normalized);
       } catch (err) {
         setError(err.message || String(err));

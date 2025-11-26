@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect } from "react";
-import Lenis from "@studio-freight/lenis";
+// import Lenis from "@studio-freight/lenis";  // Lenis disabled to test scroll issue
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Navbar from "./components/layout/Navbar";
@@ -24,24 +24,23 @@ const geistMono = Geist_Mono({
 
 export default function RootLayout({ children }) {
   useEffect(() => {
-    // Initialize Lenis
-    const lenis = new Lenis({
-      duration: 1.2, // Scroll speed (1 = normal, >1 = slower)
-      smooth: true,
-      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)), // smooth easing
-    });
+    // Lenis disabled, so no smooth scroll initialization to test default scroll behavior
 
-    function raf(time) {
-      lenis.raf(time);
-      requestAnimationFrame(raf);
-    }
+    // If needed in future, the Lenis setup can be re-enabled with adjusted config
+    // const lenis = new Lenis({
+    //   duration: 1.2,
+    //   smooth: true,
+    //   easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+    // });
 
-    requestAnimationFrame(raf);
-  
-    
+    // function raf(time) {
+    //   lenis.raf(time);
+    //   requestAnimationFrame(raf);
+    // }
 
+    // requestAnimationFrame(raf);
 
-    return () => lenis.destroy(); // Cleanup on unmount
+    // return () => lenis.destroy();
   }, []);
 
   return (

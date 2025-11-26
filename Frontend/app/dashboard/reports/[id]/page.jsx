@@ -168,9 +168,8 @@ function AccordionSection({ title, items, type, icon: Icon, defaultOpen = false 
   );
 }
 
-export default function ReportPage({ params }) {
-  const routeParams = useParams();
-  const id = params?.id ?? routeParams?.id;
+export default function ReportPage() {
+  const { id } = useParams();
 
   const [content, setContent] = useState(null);
   const [analysis, setAnalysis] = useState({

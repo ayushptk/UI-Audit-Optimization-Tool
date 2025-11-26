@@ -68,8 +68,6 @@ async def list_designs(
         })
 
     return results
-
-
 @router.get("/design/{design_id}")
 async def get_design_image(
     design_id: int,

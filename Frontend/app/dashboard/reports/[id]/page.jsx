@@ -49,20 +49,37 @@ function Section({ title, items, type }) {
         <Badge type={type} />
       </div>
       <ul className="space-y-3">
-        {list.map((text, idx) => (
-          <li key={idx} className="flex gap-3">
-            <span
-              className={`mt-1 inline-block h-2 w-2 flex-none rounded-full ${
-                type === "good"
-                  ? "bg-emerald-500"
-                  : type === "issue"
-                  ? "bg-rose-500"
-                  : "bg-indigo-500"
-              }`}
-            />
-            <p className="text-sm leading-6 text-gray-700">{String(text)}</p>
-          </li>
-        ))}
+        {list.map((item, idx) => {
+          // normalize display text: handle strings or common object shapes
+          let display = "";
+          if (item == null) display = "";
+          else if (typeof item === "string") display = item;
+          else if (typeof item === "object") {
+            display =
+              item.text ?? item.message ?? item.description ?? item.title ??
+              // fallback: if object is simple with a single key, show its value
+              (Object.keys(item).length === 1
+                ? String(item[Object.keys(item)[0]])
+                : JSON.stringify(item));
+          } else {
+            display = String(item);
+          }
+
+          return (
+            <li key={idx} className="flex gap-3">
+              <span
+                className={`mt-1 inline-block h-2 w-2 flex-none rounded-full ${
+                  type === "good"
+                    ? "bg-emerald-500"
+                    : type === "issue"
+                    ? "bg-rose-500"
+                    : "bg-indigo-500"
+                }`}
+              />
+              <p className="text-sm leading-6 text-gray-700">{display}</p>
+            </li>
+          );
+        })}
       </ul>
     </section>
   );

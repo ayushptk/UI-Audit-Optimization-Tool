@@ -5,6 +5,8 @@ import { useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { uploadFile } from '../../lib/upload';
 import { analyzeDesignById } from '../../lib/analyze';
+import ScanningAnimation from '../../components/ScanningAnimation';
+import { useEffect } from 'react';
 
 export default function UploadPage() {
   const router = useRouter();
@@ -13,7 +15,31 @@ export default function UploadPage() {
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
   const [progress, setProgress] = useState(0);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
   const inputRef = useRef(null);
+const [status, setStatus] = useState("Uploading…");
+const [open, setOpen] = useState(true);
+
+
+useEffect(() => {
+  // Simulate progress
+  const labels = [
+    "Uploading design",
+    "Preprocessing layers",
+    "Analyzing typography",
+    "Evaluating spacing",
+    "Checking color contrast",
+    "Assessing layout",
+    "Finalizing report",
+  ];
+  let i = 0;
+  const t = setInterval(() => {
+    setProgress((p) => Math.min(100, p + 7));
+    setStatus(labels[Math.min(labels.length - 1, Math.floor(Math.random() * labels.length))]);
+  }, 600);
+  return () => clearInterval(t);
+}, []);
+
 
   const onFilesAdd = (incoming) => {
     if (incoming.length > 0) {
@@ -83,6 +109,9 @@ export default function UploadPage() {
         setProgress(percentCompleted);
       });
 
+      // Start analyzing animation
+      setIsAnalyzing(true);
+
       // Analyze the uploaded file by design id
       await analyzeDesignById(uploadResponse.id, token);
       console.log("File uploaded and analyzed successfully.");
@@ -93,6 +122,9 @@ export default function UploadPage() {
         inputRef.current.value = '';
       }
 
+      // Stop analyzing animation
+      setIsAnalyzing(false);
+
       // Navigate to reports page with dynamic id
       const reportId = uploadResponse.id || '1'; // Use id from response or default to '1'
       router.push(`/dashboard/reports/${reportId}`);
@@ -102,6 +134,7 @@ export default function UploadPage() {
       setError(err.response?.data?.detail || "Upload or analysis failed.");
       console.log("Navigated to reports page error page.");
       setProgress(0);
+      setIsAnalyzing(false);
     }
   };
 
@@ -248,6 +281,13 @@ export default function UploadPage() {
           )}
         </section>
       </div>
+     {isAnalyzing && (
+        <ScanningAnimation
+          progress={progress}
+          status={status}
+          image={selectedFile?.type?.startsWith('image') ? selectedFile : undefined}
+        />
+      )}
     </div>
   );
 }

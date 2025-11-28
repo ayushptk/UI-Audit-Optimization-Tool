@@ -3,7 +3,9 @@
 import React from 'react';
 import { FaArrowRight } from 'react-icons/fa';
 import { motion } from 'framer-motion';
-
+import LiquidEther from './Liquidether';
+import MagnetizeButton from './MagnetizeButton';
+import Prism from './Prism';
 const Herosection = () => {
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -38,22 +40,41 @@ const Herosection = () => {
         ease: 'easeOut',
       },
     },
-    hover: {
-      scale: 1.05,
-      transition: { duration: 0.2 },
-    },
   };
 
   return (
-    <section className="bg-gradient-to-br from-blue-50 to-indigo-100 py-20 px-4 min-h-screen flex items-center">
+    <section className="relative py-20 px-4 min-h-screen flex items-center">
+      <div style={{ width: '100%', height: '100vh', position: 'absolute', top: 0, left: 0 }}>
+      <Prism
+
+    animationType="hover"
+
+    timeScale={0.5}
+
+    height={3.5}
+
+    baseWidth={5.5}
+
+    scale={3.6}
+
+    hueShift={0}
+
+    colorFrequency={1}
+
+    noise={0}
+
+    glow={1}
+
+  />
+      </div>
       <motion.div
-        className="max-w-6xl mx-auto text-center"
+        className="relative z-10 max-w-6xl mx-auto text-center"
         variants={containerVariants}
         initial="hidden"
         animate="visible"
       >
         <motion.h1
-          className="text-5xl md:text-7xl font-bold text-gray-900 mb-6 leading-tight mt-16"
+          className="text-5xl md:text-7xl font-bold text-gray-900 mb-6 leading-tight mt-13"
           variants={itemVariants}
         >
           Revolutionize Your UI with Automated{' '}

@@ -6,6 +6,7 @@ import { motion } from 'framer-motion';
 import LiquidEther from './Liquidether';
 import MagnetizeButton from './MagnetizeButton';
 import Prism from './Prism';
+import TrueFocus from './TrueFocus';
 const Herosection = () => {
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -73,20 +74,29 @@ const Herosection = () => {
         initial="hidden"
         animate="visible"
       >
-        <motion.h1
-          className="text-5xl md:text-7xl font-bold text-gray-900 mb-6 leading-tight mt-13"
-          variants={itemVariants}
-        >
-          Revolutionize Your UI with Automated{' '}
-          <motion.span
-            className="text-indigo-600"
-            initial={{ color: '#6B7280' }}
-            animate={{ color: '#4F46E5' }}
-            transition={{ duration: 1, delay: 1 }}
-          >
-            UX Insights
-          </motion.span>
-        </motion.h1>
+     <motion.h1
+  className="text-5xl md:text-7xl font-bold text-gray-900 mb-6 leading-tight mt-13"
+  variants={itemVariants}
+>
+  <span className="">
+    Revolutionize Your UI with  Automated{' '}
+    <motion.span
+      className="text-indigo-600 inline-block align-baseline"
+      initial={{ color: '#6B7280' }}
+      animate={{ color: '#4F46E5' }}
+      transition={{ duration: 1, delay: 1 }}
+    >
+      <TrueFocus
+        sentence="UX Insights"
+        manualMode={false}
+        blurAmount={5}
+        borderColor="red"
+        animationDuration={2}
+        pauseBetweenAnimations={1}
+      />
+    </motion.span>
+  </span>
+</motion.h1>
         <motion.p
           className="text-xl md:text-2xl text-gray-600 mb-10 max-w-3xl mx-auto"
           variants={itemVariants}

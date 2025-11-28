@@ -61,7 +61,7 @@ const TrueFocus = ({
   };
 
   return (
-    <div className="focus-container" ref={containerRef}>
+    <span className="focus-container" ref={containerRef}>
       {words.map((word, index) => {
         const isActive = index === currentIndex;
         return (
@@ -111,7 +111,7 @@ const TrueFocus = ({
         <span className="corner bottom-left"></span>
         <span className="corner bottom-right"></span>
       </motion.div>
-    </div>
+    </span>
   );
 };
 

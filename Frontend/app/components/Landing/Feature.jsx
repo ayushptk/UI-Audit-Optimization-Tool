@@ -107,7 +107,7 @@ const Feature = () => {
             key={index}
             className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-2 text-center"
           >
-            <div className="flex justify-center mb-4">{feature.icon}</div>
+            <div className="flex justify-center mb-4 "><span className='bg-gray-100 p-4 rounded-full'>{feature.icon}</span></div>
             <h3 className="text-md font-semibold text-gray-900 mb-2">{feature.title}</h3>
             <p className="text-gray-600 text-sm">{feature.description}</p>
           </div>
@@ -117,10 +117,10 @@ const Feature = () => {
   );
 
   return (
-    <section className="py-20 px-6 bg-white">
+    <section className="py-10 px-6 bg-white">
       <div className="max-w-6xl mx-auto text-center mb-16">
         <button className="text-blue-900 border border-indigo-600 px-6 py-2 rounded-3xl mb-6">
-          Feature
+          Features
         </button>
         <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
           Powerful Features for Better Design

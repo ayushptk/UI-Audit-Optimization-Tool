@@ -46,6 +46,9 @@ const Herosection = () => {
   return (
     <section className="relative py-20 px-4 min-h-screen flex items-center">
       <div style={{ width: '100%', height: '100vh', position: 'absolute', top: 0, left: 0 }}>
+
+     
+
       <Prism
 
     animationType="hover"
@@ -75,9 +78,14 @@ const Herosection = () => {
         animate="visible"
       >
      <motion.h1
-  className="text-5xl md:text-7xl font-bold text-gray-900 mb-6 leading-tight mt-13"
+  className="text-5xl md:text-7xl font-bold text-gray-900 mb-6 leading-tight mt-8"
   variants={itemVariants}
 >
+  <div>
+
+    <span className="text-[16px] border border-indigo-600  px-4 py-3 rounded-full font-small">#1 Audit Platform</span>
+  </div>
+  
   <span className="">
     Revolutionize Your UI with  Automated{' '}
     <motion.span
@@ -98,7 +106,7 @@ const Herosection = () => {
   </span>
 </motion.h1>
         <motion.p
-          className="text-xl md:text-2xl text-gray-600 mb-10 max-w-3xl mx-auto"
+          className="text-xl md:text-xl text-gray-600 mb-10 max-w-3xl mx-auto"
           variants={itemVariants}
         >
           Upload your designs and get instant feedback on usability, accessibility, visual hierarchy, and consistency. Perfect for designers, product teams, and developers.

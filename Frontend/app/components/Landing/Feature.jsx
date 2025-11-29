@@ -119,7 +119,7 @@ const Feature = () => {
   return (
     <section className="py-10 px-6 bg-white">
       <div className="max-w-6xl mx-auto text-center mb-16">
-        <button className="text-blue-900 border border-indigo-600 px-6 py-2 rounded-3xl mb-6">
+        <button className="text-blue-900 border border-slate-700 px-6 py-2 rounded-3xl mb-6">
           Features
         </button>
         <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">

@@ -83,7 +83,7 @@ const Herosection = () => {
 >
   <div>
 
-    <span className="text-[16px] border border-indigo-600  px-4 py-3 rounded-full font-small">#1 Audit Platform</span>
+    <span className="text-[16px] border border-slate-700  px-4 py-3 rounded-full font-small">#1 Audit Platform</span>
   </div>
   
   <span className="">

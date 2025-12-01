@@ -111,7 +111,7 @@ const Herosection = () => {
           Upload your designs and get instant feedback on usability, accessibility, visual hierarchy, and consistency. Perfect for designers, product teams, and developers.
         </motion.p>
         <motion.div
-          className="flex flex-col sm:flex-row justify-center gap-4"
+          className="flex  sm:flex-row justify-center gap-4 "
           variants={containerVariants}
         >
           <motion.button

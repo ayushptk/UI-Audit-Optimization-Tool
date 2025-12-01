@@ -1,110 +1,81 @@
 import React from 'react';
-import { FaFileUpload, FaFileAlt, FaStar } from 'react-icons/fa';
 import { FaPenNib } from "react-icons/fa6";
 import { TbReportSearch } from "react-icons/tb";
+import { FaStar } from 'react-icons/fa';
+import { FiArrowUpRight, FiArrowDownRight } from 'react-icons/fi';
+
 const StatsCard = () => {
+  const stats = [
+    {
+      title: "Total Designs",
+      value: "150",
+      change: "+12.5%",
+      trend: "up",
+      icon: FaPenNib,
+      color: "blue",
+      description: "vs. last month"
+    },
+    {
+      title: "Audit Reports",
+      value: "45",
+      change: "+8.2%",
+      trend: "up",
+      icon: TbReportSearch,
+      color: "indigo",
+      description: "vs. last month"
+    },
+    {
+      title: "Avg. Score",
+      value: "85%",
+      change: "-2.4%",
+      trend: "down",
+      icon: FaStar,
+      color: "amber",
+      description: "vs. last month"
+    }
+  ];
+
+  const getColorClasses = (color) => {
+    const colors = {
+      blue: "bg-blue-50 text-blue-600 group-hover:bg-blue-600 group-hover:text-white",
+      indigo: "bg-indigo-50 text-indigo-600 group-hover:bg-indigo-600 group-hover:text-white",
+      amber: "bg-amber-50 text-amber-600 group-hover:bg-amber-500 group-hover:text-white",
+    };
+    return colors[color] || colors.blue;
+  };
+
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-4">
-      {/* Total Designs Uploaded */}
-    
-    {/* design first card */}
-    <div className="bg-white dark:bg-gray-800  rounded-lg p-6  space-x-4 border border-gray-200 shadow-xs ">
-      <div className=" flex gap-4  mb-4">
-        <div className="flex-shrink-0 bg-gray-100 dark:bg-gray-700 rounded-full p-3">
-         <FaPenNib className="text-orange-500 text-3xl" />
-        </div>
-        <div>
-          <h3 className="text-md font-large text-gray-900 dark:text-white"> Designs</h3>
-          <p className="text-xl font-bold text-gray-700 dark:text-gray-300">150</p>
-        </div>
-      </div>
-      <div className="flex items-center space-x-1 text-sm ">
-      {/* Up Arrow SVG */}
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        width="14"
-        height="14"
-        fill="none"
-        viewBox="0 0 24 24"
-        strokeWidth="2"
-        stroke="green"
-        className="w-4 h-4"
-      >
-        <path strokeLinecap="round" strokeLinejoin="round" d="M4 12l8-8 8 8M12 4v16" />
-      </svg>
-
-      {/* Percentage and Text */}
-      <span className="text-green-600 font-medium">1.21%</span>
-      <span className="text-gray-800">from last Monday</span>
-    </div>
-      
-      </div>
-
-      {/* Number of Audit Reports Generated */}
-      <div className="bg-white dark:bg-gray-800  rounded-lg p-6  space-x-4 border border-gray-200 shadow-xs ">
-        <div className=" flex gap-4  mb-4">
-          <div className="flex-shrink-0 bg-gray-100 dark:bg-gray-700 rounded-full p-3">
-           <TbReportSearch  className="text-green-500 text-3xl"/>
-          </div>
-          <div>
-            <h3 className="text-md font-large text-gray-900 dark:text-white">Audit Reports</h3>
-            <p className="text-xl font-bold text-gray-700 dark:text-gray-300">45</p>
-          </div>
-        </div>
-        <div className="flex items-center space-x-1 text-sm ">
-        {/* Up Arrow SVG */}
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width="14"
-          height="14"
-          fill="none"
-          viewBox="0 0 24 24"
-          strokeWidth="2"
-          stroke="green"
-          className="w-4 h-4"
-        >
-          <path strokeLinecap="round" strokeLinejoin="round" d="M4 12l8-8 8 8M12 4v16" />
-        </svg>
-
-        {/* Percentage and Text */}
-        <span className="text-green-600 font-medium">2.5%</span>
-        <span className="text-gray-800">from last Monday</span>
-      </div>
-        
-        </div>
-
-        {/* Average Design Score */}
-        <div className="bg-white dark:bg-gray-800  rounded-lg p-6  space-x-4 border border-gray-200 shadow-xs ">
-          <div className=" flex gap-4  mb-4">
-            <div className="flex-shrink-0 bg-gray-100 dark:bg-gray-700 rounded-full p-3">
-             <FaStar className="text-yellow-500 text-3xl" />
-            </div>
-            <div>
-              <h3 className="text-md font-large text-gray-900 dark:text-white">Average Design Score</h3>
-              <p className="text-xl font-bold text-gray-700 dark:text-gray-300">85%</p>
-            </div>
-          </div>
-          <div className="flex items-center space-x-1 text-sm ">
-          {/* Up Arrow SVG */}
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="14"
-            height="14"
-            fill="none"
-            viewBox="0 0 24 24"
-            strokeWidth="2"
-            stroke="green"
-            className="w-4 h-4"
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      {stats.map((stat, index) => {
+        const Icon = stat.icon;
+        return (
+          <div
+            key={index}
+            className="group bg-white rounded-2xl p-6 border border-slate-100 shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-300"
           >
-            <path strokeLinecap="round" strokeLinejoin="round" d="M4 12l8-8 8 8M12 4v16" />
-          </svg>
+            <div className="flex justify-between items-start mb-4">
+              <div className={`p-3 rounded-xl transition-colors duration-300 ${getColorClasses(stat.color)}`}>
+                <Icon className="text-xl" />
+              </div>
+              <div className={`flex items-center gap-1 text-xs font-medium px-2 py-1 rounded-full ${stat.trend === 'up'
+                  ? 'bg-green-50 text-green-600'
+                  : 'bg-red-50 text-red-600'
+                }`}>
+                {stat.trend === 'up' ? <FiArrowUpRight /> : <FiArrowDownRight />}
+                {stat.change}
+              </div>
+            </div>
 
-          {/* Percentage and Text */}
-          <span className="text-green-600 font-medium">3.1%</span>
-          <span className="text-gray-800">from last Monday</span>
-        </div>
-          
+            <div>
+              <h3 className="text-slate-500 text-sm font-medium mb-1">{stat.title}</h3>
+              <div className="flex items-baseline gap-2">
+                <span className="text-2xl font-bold text-slate-900 font-outfit">{stat.value}</span>
+                <span className="text-xs text-slate-400">{stat.description}</span>
+              </div>
+            </div>
           </div>
+        );
+      })}
     </div>
   );
 };

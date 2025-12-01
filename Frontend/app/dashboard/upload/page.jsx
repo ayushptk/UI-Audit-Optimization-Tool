@@ -1,12 +1,12 @@
-// page.jsx
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { uploadFile } from '../../lib/upload';
 import { analyzeDesignById } from '../../lib/analyze';
 import ScanningAnimation from '../../components/ScanningAnimation';
-import { useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { FiUploadCloud, FiFile, FiX, FiImage, FiCheckCircle, FiAlertCircle } from 'react-icons/fi';
 
 export default function UploadPage() {
   const router = useRouter();
@@ -17,33 +17,38 @@ export default function UploadPage() {
   const [progress, setProgress] = useState(0);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const inputRef = useRef(null);
-const [status, setStatus] = useState("Uploading…");
-const [open, setOpen] = useState(true);
+  const [status, setStatus] = useState("Uploading…");
 
+  useEffect(() => {
+    if (!isAnalyzing) return;
 
-useEffect(() => {
-  // Simulate progress
-  const labels = [
-    "Uploading design",
-    "Preprocessing layers",
-    "Analyzing typography",
-    "Evaluating spacing",
-    "Checking color contrast",
-    "Assessing layout",
-    "Finalizing report",
-  ];
-  let i = 0;
-  const t = setInterval(() => {
-    setProgress((p) => Math.min(100, p + 7));
-    setStatus(labels[Math.min(labels.length - 1, Math.floor(Math.random() * labels.length))]);
-  }, 600);
-  return () => clearInterval(t);
-}, []);
+    // Simulate progress
+    const labels = [
+      "Uploading design assets...",
+      "Preprocessing layers...",
+      "Analyzing typography hierarchy...",
+      "Evaluating spacing & grid...",
+      "Checking color contrast accessibility...",
+      "Assessing layout consistency...",
+      "Finalizing audit report...",
+    ];
+
+    const t = setInterval(() => {
+      setProgress((p) => {
+        const newProgress = p + (Math.random() * 5);
+        return Math.min(98, newProgress);
+      });
+      setStatus(labels[Math.floor(Math.random() * labels.length)]);
+    }, 800);
+
+    return () => clearInterval(t);
+  }, [isAnalyzing]);
 
 
   const onFilesAdd = (incoming) => {
     if (incoming.length > 0) {
       setSelectedFile(incoming[0]);
+      setError("");
     }
   };
 
@@ -90,7 +95,7 @@ useEffect(() => {
     ];
 
     if (!allowedTypes.includes(selectedFile.type) && !selectedFile.name.endsWith(".fig")) {
-      setError("File type not allowed. Please upload png, jpg, svg or fig files.");
+      setError("File type not allowed. Please upload PNG, JPG, SVG or .fig files.");
       return;
     }
 
@@ -106,7 +111,8 @@ useEffect(() => {
         const percentCompleted = Math.round(
           (progressEvent.loaded * 100) / progressEvent.total
         );
-        setProgress(percentCompleted);
+        // We'll let the simulation take over for the "analysis" part, so just go up to 30% for upload
+        setProgress(Math.min(30, percentCompleted));
       });
 
       // Start analyzing animation
@@ -114,174 +120,175 @@ useEffect(() => {
 
       // Analyze the uploaded file by design id
       await analyzeDesignById(uploadResponse.id, token);
-      console.log("File uploaded and analyzed successfully.");
+
+      setProgress(100);
+      setStatus("Analysis complete!");
       setMessage("Upload and analysis successful!");
-      setSelectedFile(null);
-      setProgress(0);
-      if (inputRef.current) {
-        inputRef.current.value = '';
-      }
 
-      // Stop analyzing animation
-      setIsAnalyzing(false);
+      // Small delay to show 100%
+      setTimeout(() => {
+        setIsAnalyzing(false);
+        setSelectedFile(null);
+        setProgress(0);
+        if (inputRef.current) {
+          inputRef.current.value = '';
+        }
 
-      // Navigate to reports page with dynamic id
-      const reportId = uploadResponse.id || '1'; // Use id from response or default to '1'
-      router.push(`/dashboard/reports/${reportId}`);
-      console.log("Navigated to reports page.");
+        // Navigate to reports page with dynamic id
+        const reportId = uploadResponse.id || '1';
+        router.push(`/dashboard/reports/${reportId}`);
+      }, 1000);
+
     } catch (err) {
       console.error(err);
-      setError(err.response?.data?.detail || "Upload or analysis failed.");
-      console.log("Navigated to reports page error page.");
+      setError(err.response?.data?.detail || "Upload or analysis failed. Please try again.");
       setProgress(0);
       setIsAnalyzing(false);
     }
   };
 
   return (
-    <div className="min-h-[calc(100vh-4rem)] w-full  px-4  sm:px-4 lg:px-6">
-      <div className="mx-auto max-w-4xl">
-        <header className="mb-8">
-          <h1 className="text-2xl font-semibold tracking-tight text-neutral-900">
-            Upload Files
+    <div className="min-h-[calc(100vh-8rem)] w-full flex flex-col items-center justify-center p-4">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="w-full max-w-3xl"
+      >
+        <div className="text-center mb-10">
+          <h1 className="text-4xl font-bold font-outfit text-slate-900 tracking-tight mb-3">
+            Upload Design
           </h1>
-          <p className="mt-2 text-sm text-neutral-500">
-            Drag and drop files here, or click to browse from your device.
+          <p className="text-slate-500 text-lg">
+            Upload your UI design to get instant AI-powered feedback.
           </p>
-        </header>
+        </div>
 
-        <section
-          className={[
-            'rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm',
-            'transition-colors',
-            isDragging ? 'ring-2 ring-neutral-900/10' : '',
-          ].join(' ')}
-        >
-          <div
-            onDragOver={(e) => {
-              e.preventDefault();
-              setIsDragging(true);
-            }}
-            onDragLeave={() => setIsDragging(false)}
-            onDrop={handleDrop}
-            onClick={() => inputRef.current?.click()}
-            role="button"
-            tabIndex={0}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter' || e.key === ' ') {
-                inputRef.current?.click();
-              }
-            }}
-            className={[
-              'flex cursor-pointer flex-col items-center justify-center gap-3',
-              'rounded-xl border-2 border-dashed p-10',
-              isDragging
-                ? 'border-neutral-900/30 bg-neutral-50'
-                : 'border-neutral-300 hover:border-neutral-400 hover:bg-neutral-50',
-              'transition-colors',
-            ].join(' ')}
-            aria-label="Upload files by dragging and dropping or browsing"
-          >
-            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-neutral-100">
-              {/* Minimal icon */}
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-6 w-6 text-neutral-700"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth={1.5}
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M3 15.75A4.5 4.5 0 017.5 11.25h.75m0 0a4.5 4.5 0 018.25-1.75m-8.25 1.75h6a3.75 3.75 0 110 7.5H7.5a4.5 4.5 0 01-4.5-4.5m9-6v10.5m0 0l-3.5-3.5m3.5 3.5l3.5-3.5"
-                />
-              </svg>
-            </div>
-            <div className="text-center">
-              <p className="text-sm font-medium text-neutral-900">
-                Drag and drop files here
-              </p>
-              <p className="mt-1 text-xs text-neutral-500">
-                or click to browse. PNG, JPG, PDF up to 10MB.
-              </p>
-            </div>
-            <input
-              ref={inputRef}
-              type="file"
-              className="hidden"
-              onChange={handleBrowse}
-              accept=".png,.jpg,.jpeg,.pdf,.fig"
-            />
-          </div>
+        <div className="bg-white rounded-3xl shadow-xl shadow-slate-200/50 border border-slate-100 overflow-hidden relative">
+          {/* Glassmorphism decorative elements */}
+          <div className="absolute top-0 right-0 -mt-20 -mr-20 w-64 h-64 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none"></div>
+          <div className="absolute bottom-0 left-0 -mb-20 -ml-20 w-64 h-64 bg-blue-500/10 rounded-full blur-3xl pointer-events-none"></div>
 
-          {selectedFile && (
-            <div className="mt-6">
-              <div className="mb-2 text-sm font-medium text-neutral-900">
-                Selected file
-              </div>
-              <div className="divide-y divide-neutral-200 rounded-xl border border-neutral-200 bg-white">
-                <div className="flex items-center justify-between gap-3 px-4 py-3">
-                  <div className="flex min-w-0 items-center gap-3">
-                    <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-neutral-100">
-                      <span className="text-xs text-neutral-700">
-                        {selectedFile.type.startsWith('image') ? 'IMG' : selectedFile.type.includes('pdf') ? 'PDF' : 'FILE'}
-                      </span>
-                    </div>
-                    <div className="min-w-0">
-                      <p className="truncate text-sm font-medium text-neutral-900">
-                        {selectedFile.name}
-                      </p>
-                      <p className="text-xs text-neutral-500">
-                        {humanSize(selectedFile.size)}
-                      </p>
-                    </div>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => setSelectedFile(null)}
-                    className="rounded-full p-2 text-neutral-500 hover:bg-neutral-100 hover:text-neutral-700"
-                    aria-label={`Remove ${selectedFile.name}`}
+          <div className="p-8 md:p-12 relative z-10">
+            <div
+              onDragOver={(e) => {
+                e.preventDefault();
+                setIsDragging(true);
+              }}
+              onDragLeave={() => setIsDragging(false)}
+              onDrop={handleDrop}
+              onClick={() => !selectedFile && inputRef.current?.click()}
+              className={`
+                relative group cursor-pointer
+                flex flex-col items-center justify-center gap-4
+                rounded-2xl border-2 border-dashed transition-all duration-300
+                h-80 w-full
+                ${isDragging
+                  ? 'border-indigo-500 bg-indigo-50/50 scale-[1.02]'
+                  : selectedFile
+                    ? 'border-slate-200 bg-slate-50/30'
+                    : 'border-slate-300 hover:border-indigo-400 hover:bg-slate-50'
+                }
+              `}
+            >
+              <input
+                ref={inputRef}
+                type="file"
+                className="hidden"
+                onChange={handleBrowse}
+                accept=".png,.jpg,.jpeg,.pdf,.fig"
+              />
+
+              <AnimatePresence mode="wait">
+                {!selectedFile ? (
+                  <motion.div
+                    key="empty"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    className="flex flex-col items-center text-center"
                   >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="h-4 w-4"
-                      viewBox="0 0 20 20"
-                      fill="currentColor"
+                    <div className={`
+                      w-20 h-20 rounded-full flex items-center justify-center mb-6 transition-colors duration-300
+                      ${isDragging ? 'bg-indigo-100 text-indigo-600' : 'bg-slate-100 text-slate-400 group-hover:bg-indigo-50 group-hover:text-indigo-500'}
+                    `}>
+                      <FiUploadCloud className="w-10 h-10" />
+                    </div>
+                    <p className="text-xl font-semibold text-slate-900 mb-2">
+                      Drag & drop your design here
+                    </p>
+                    <p className="text-slate-500">
+                      or <span className="text-indigo-600 font-medium underline decoration-2 decoration-indigo-200 underline-offset-2 group-hover:decoration-indigo-500 transition-all">browse files</span> from your computer
+                    </p>
+                    <p className="mt-4 text-xs font-medium text-slate-400 uppercase tracking-wider">
+                      Supports PNG, JPG, PDF, FIG
+                    </p>
+                  </motion.div>
+                ) : (
+                  <motion.div
+                    key="selected"
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.9 }}
+                    className="w-full max-w-md bg-white rounded-2xl shadow-lg border border-slate-100 p-6 flex items-center gap-4"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <div className="w-16 h-16 rounded-xl bg-indigo-50 flex items-center justify-center flex-shrink-0 text-indigo-600">
+                      {selectedFile.type.startsWith('image') ? <FiImage className="w-8 h-8" /> : <FiFile className="w-8 h-8" />}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-semibold text-slate-900 truncate">{selectedFile.name}</p>
+                      <p className="text-sm text-slate-500">{humanSize(selectedFile.size)}</p>
+                    </div>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setSelectedFile(null);
+                      }}
+                      className="p-2 text-slate-400 hover:text-rose-500 hover:bg-rose-50 rounded-full transition-colors"
                     >
-                      <path
-                        fillRule="evenodd"
-                        d="M10 18a8 8 0 100-16 8 8 0 000 16zm2.828-10.828a.75.75 0 00-1.06-1.06L10 7.94 8.232 6.172a.75.75 0 10-1.06 1.06L8.94 9l-1.768 1.768a.75.75 0 101.06 1.06L10 10.06l1.768 1.768a.75.75 0 101.06-1.06L11.06 9l1.768-1.768z"
-                        clipRule="evenodd"
-                      />
-                    </svg>
-                  </button>
-                </div>
-              </div>
-
-              <div className="mt-4 flex items-center justify-end gap-3">
-                <button
-                  type="button"
-                  onClick={() => setSelectedFile(null)}
-                  className="rounded-lg border border-neutral-300 bg-white px-4 py-2 text-sm font-medium text-neutral-700 hover:bg-neutral-50"
-                >
-                  Clear
-                </button>
-                <button
-                  type="button"
-                  onClick={handleUpload}
-                  disabled={!selectedFile}
-                  className="rounded-lg bg-neutral-900 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-neutral-800 disabled:cursor-not-allowed disabled:bg-neutral-300"
-                >
-                  Upload
-                </button>
-              </div>
+                      <FiX className="w-5 h-5" />
+                    </button>
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
-          )}
-        </section>
-      </div>
-     {isAnalyzing && (
+
+            {error && (
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="mt-4 p-4 bg-rose-50 text-rose-600 rounded-xl flex items-center gap-3 text-sm font-medium"
+              >
+                <FiAlertCircle className="w-5 h-5 flex-shrink-0" />
+                {error}
+              </motion.div>
+            )}
+
+            <div className="mt-8 flex justify-end">
+              <button
+                onClick={handleUpload}
+                disabled={!selectedFile || isAnalyzing}
+                className={`
+                  relative overflow-hidden group
+                  px-8 py-4 rounded-xl font-semibold text-white shadow-lg shadow-indigo-200
+                  transition-all duration-300
+                  ${!selectedFile || isAnalyzing
+                    ? 'bg-slate-300 cursor-not-allowed shadow-none'
+                    : 'bg-indigo-600 hover:bg-indigo-700 hover:shadow-indigo-300 hover:-translate-y-0.5 active:translate-y-0'
+                  }
+                `}
+              >
+                <span className="relative z-10 flex items-center gap-2">
+                  {isAnalyzing ? 'Analyzing...' : 'Start Audit'}
+                  {!isAnalyzing && <FiCheckCircle className="w-5 h-5" />}
+                </span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </motion.div>
+
+      {isAnalyzing && (
         <ScanningAnimation
           progress={progress}
           status={status}

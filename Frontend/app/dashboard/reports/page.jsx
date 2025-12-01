@@ -2,64 +2,75 @@
 
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
+import { motion } from "framer-motion";
+import { FiFileText, FiTrendingUp, FiAlertCircle, FiCheckCircle, FiClock, FiArrowRight, FiFilter, FiDownload } from "react-icons/fi";
 
 function Badge({ tone = "neutral", children }) {
-  const tones = {
-    neutral: "bg-neutral-100 text-neutral-700 ring-1 ring-neutral-200",
-    good: "bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200",
-    issue: "bg-rose-50 text-rose-700 ring-1 ring-rose-200",
-    warning: "bg-amber-50 text-amber-700 ring-1 ring-amber-200",
+  const styles = {
+    neutral: "bg-slate-100 text-slate-600 ring-slate-200",
+    good: "bg-emerald-50 text-emerald-700 ring-emerald-200",
+    issue: "bg-rose-50 text-rose-700 ring-rose-200",
+    warning: "bg-amber-50 text-amber-700 ring-amber-200",
   };
   return (
-    <span className={`inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ${tones[tone]}`}>
+    <span className={`inline-flex items-center rounded-md px-2.5 py-1 text-xs font-medium ring-1 ring-inset ${styles[tone]}`}>
       {children}
     </span>
   );
 }
 
-function Kpi({ label, value, hint, tone = "neutral" }) {
-  const border = {
-    neutral: "border-neutral-200",
-    emerald: "border-emerald-200",
-    rose: "border-rose-200",
-    indigo: "border-indigo-200",
-    amber: "border-amber-200",
-  }[tone];
+function Kpi({ label, value, hint, tone = "neutral", icon: Icon }) {
+  const styles = {
+    neutral: "bg-white border-slate-200 text-slate-900",
+    emerald: "bg-white border-emerald-100 text-emerald-900",
+    rose: "bg-white border-rose-100 text-rose-900",
+    indigo: "bg-white border-indigo-100 text-indigo-900",
+    amber: "bg-white border-amber-100 text-amber-900",
+  };
+
+  const iconColors = {
+    neutral: "bg-slate-100 text-slate-500",
+    emerald: "bg-emerald-100 text-emerald-600",
+    rose: "bg-rose-100 text-rose-600",
+    indigo: "bg-indigo-100 text-indigo-600",
+    amber: "bg-amber-100 text-amber-600",
+  };
+
   return (
-    <div className={`rounded-2xl border ${border} bg-white p-5 shadow-sm`}>
-      <div className="text-xs text-neutral-500">{label}</div>
-      <div className="mt-1 text-2xl font-semibold text-neutral-900">{value}</div>
-      {hint && <div className="mt-1 text-xs text-neutral-500">{hint}</div>}
+    <div className={`relative overflow-hidden rounded-2xl border p-6 shadow-sm transition-all hover:shadow-md ${styles[tone]}`}>
+      <div className="flex items-start justify-between">
+        <div>
+          <p className="text-sm font-medium text-slate-500">{label}</p>
+          <p className="mt-2 text-3xl font-bold tracking-tight">{value}</p>
+        </div>
+        {Icon && (
+          <div className={`rounded-xl p-2.5 ${iconColors[tone]}`}>
+            <Icon className="w-5 h-5" />
+          </div>
+        )}
+      </div>
+      {hint && <div className="mt-4 text-xs font-medium text-slate-400">{hint}</div>}
     </div>
   );
 }
 
 function ScorePill({ score }) {
   const s = Math.max(0, Math.min(100, Number(score) || 0));
-  const tone = s >= 85 ? "text-emerald-600 bg-emerald-50 ring-emerald-200" : s >= 70 ? "text-amber-600 bg-amber-50 ring-amber-200" : "text-rose-600 bg-rose-50 ring-rose-200";
-  return (
-    <span className={`inline-flex items-center rounded-full px-2.5 py-1 text-xs font-medium ring-1 ${tone}`}>
-      {s}/100
-    </span>
-  );
-}
+  let colorClass = "text-rose-600 bg-rose-50 ring-rose-200";
+  if (s >= 85) colorClass = "text-emerald-600 bg-emerald-50 ring-emerald-200";
+  else if (s >= 70) colorClass = "text-amber-600 bg-amber-50 ring-amber-200";
 
-function Section({ title, right, children }) {
   return (
-    <section className="rounded-2xl border border-neutral-200 bg-white p-5 shadow-sm">
-      <div className="mb-3 flex items-center justify-between">
-        <h2 className="text-base font-semibold text-neutral-900">{title}</h2>
-        {right}
+    <div className="flex items-center gap-3">
+      <div className="flex-1 h-2 w-24 bg-slate-100 rounded-full overflow-hidden">
+        <div
+          className={`h-full rounded-full ${s >= 85 ? 'bg-emerald-500' : s >= 70 ? 'bg-amber-500' : 'bg-rose-500'}`}
+          style={{ width: `${s}%` }}
+        />
       </div>
-      {children}
-    </section>
-  );
-}
-
-function Empty() {
-  return (
-    <div className="rounded-2xl border border-dashed border-neutral-200 bg-white p-8 text-center text-sm text-neutral-500">
-      No reports yet. Generate your first audit to see insights here.
+      <span className={`inline-flex items-center rounded-lg px-2.5 py-1 text-xs font-bold ring-1 ring-inset ${colorClass}`}>
+        {s}/100
+      </span>
     </div>
   );
 }
@@ -80,33 +91,18 @@ export default function ReportsOverviewPage() {
         });
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const data = await res.json();
-        // Normalize entries to the shape used by the UI
+
         const normalized = (Array.isArray(data) ? data : []).map((d) => {
           const analysisRaw = d.analysis_result;
-
-          // Try to ensure we have an object for analysis_result. If it's a string
-          // attempt to extract JSON from it (handles code-fenced AI responses).
           let analysis = analysisRaw;
+
           if (typeof analysisRaw === "string") {
-            const start = analysisRaw.indexOf("{");
-            const end = analysisRaw.lastIndexOf("}");
-            if (start !== -1 && end !== -1 && end > start) {
-              const candidate = analysisRaw.slice(start, end + 1);
-              try {
-                analysis = JSON.parse(candidate);
-              } catch (e) {
-                try {
-                  analysis = JSON.parse(analysisRaw);
-                } catch (e2) {
-                  analysis = null;
-                }
-              }
-            } else {
-              try {
-                analysis = JSON.parse(analysisRaw);
-              } catch (e) {
-                analysis = null;
-              }
+            try {
+              // simple parse attempt
+              analysis = JSON.parse(analysisRaw);
+            } catch (e) {
+              // fallback logic if needed
+              analysis = null;
             }
           }
 
@@ -114,7 +110,6 @@ export default function ReportsOverviewPage() {
           const issuesCount = Array.isArray(analysis?.issues) ? analysis.issues.length : typeof analysis?.issues === "number" ? analysis.issues : 0;
           const suggestionsCount = Array.isArray(analysis?.suggestions) ? analysis.suggestions.length : typeof analysis?.suggestions === "number" ? analysis.suggestions : 0;
 
-          // Compute a fallback score when score is missing: proportion of goods to total findings
           let scoreValue = null;
           if (analysis && typeof analysis.score === "number") {
             scoreValue = analysis.score;
@@ -147,107 +142,131 @@ export default function ReportsOverviewPage() {
     fetchReports();
   }, []);
 
-  // Aggregate
   const count = reports.length;
   const avgScore = count ? Math.round(reports.reduce((a, r) => a + (Number(r.score) || 0), 0) / count) : 0;
   const totalGood = reports.reduce((a, r) => a + (r.totals?.good || 0), 0);
   const totalIssues = reports.reduce((a, r) => a + (r.totals?.issues || 0), 0);
-  const totalSuggestions = reports.reduce((a, r) => a + (r.totals?.suggestions || 0), 0);
 
   return (
-    <div className="min-h-screen ">
-      <div className="mx-auto w-full max-w-7xl px-4 py-8 md:py-10">
-        {/* Header */}
-        <div className="mb-8 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
-          <div>
-            <h1 className="text-2xl font-bold tracking-tight text-neutral-900">Reports</h1>
-            <p className="mt-1 text-sm text-neutral-600">Overview of all generated audits across your project.</p>
-          </div>
-          <div className="flex gap-2">
-            <button className="rounded-lg border border-neutral-200 bg-white px-3.5 py-2 text-sm font-medium text-neutral-700 hover:bg-neutral-50">
-              Export Summary
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      className="min-h-screen space-y-8"
+    >
+      {/* Header */}
+      <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between pb-6 border-b border-slate-200/60">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight text-slate-900 font-outfit">Audit Reports</h1>
+          <p className="mt-2 text-slate-500">Track and analyze your design quality over time.</p>
+        </div>
+        <div className="flex gap-3">
+          <button className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50 hover:border-slate-300 transition-all shadow-sm">
+            <FiDownload className="w-4 h-4" />
+            Export Summary
+          </button>
+          <Link href="/dashboard/upload">
+            <button className="flex items-center gap-2 rounded-xl bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-indigo-700 shadow-lg shadow-indigo-200 hover:shadow-indigo-300 transition-all">
+              <FiFileText className="w-4 h-4" />
+              New Audit
             </button>
-            <Link href="/dashboard/upload">
-              <button className="rounded-lg bg-neutral-900 px-3.5 py-2 text-sm font-medium text-white hover:bg-black">
-                New Audit
-              </button>
-            </Link>
-          </div>
-        </div>
-
-        {/* KPIs */}
-        <div className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          <Kpi label="Reports" value={count} hint="Total generated" tone="neutral" />
-          <Kpi label="Average Score" value={`${avgScore}/100`} hint="Across all reports" tone="amber" />
-          <Kpi label="Highlights" value={totalGood} hint="Positive findings" tone="emerald" />
-          <Kpi label="Issues" value={totalIssues} hint="Needs attention" tone="rose" />
-        </div>
-
-        {/* Filters + List */}
-        <Section
-          title="All Reports"
-          right={
-            <div className="flex items-center gap-2">
-              <select className="rounded-lg border border-neutral-200 bg-white px-2.5 py-1.5 text-sm text-neutral-700">
-                <option>Sort: Newest</option>
-                <option>Sort: Oldest</option>
-                <option>Sort: Highest Score</option>
-                <option>Sort: Lowest Score</option>
-              </select>
-              <select className="rounded-lg border border-neutral-200 bg-white px-2.5 py-1.5 text-sm text-neutral-700">
-                <option>Filter: All</option>
-                <option>Score ≥ 85</option>
-                <option>Score 70–84</option>
-                <option>Score &lt; 70</option>
-              </select>
-            </div>
-          }
-        >
-          {loading ? (
-            <div className="rounded-2xl border border-dashed border-neutral-200 bg-white p-8 text-center text-sm text-neutral-500">Loading reports…</div>
-          ) : error ? (
-            <div className="rounded-2xl border border-dashed border-neutral-200 bg-white p-8 text-center text-sm text-rose-600">Error: {error}</div>
-          ) : reports.length === 0 ? (
-            <Empty />
-          ) : (
-            <ul className="divide-y divide-neutral-100">
-              {reports.map((r) => (
-                <li key={r.id} className="flex flex-col gap-3 py-4 md:flex-row md:items-center md:justify-between">
-                  <div className="min-w-0">
-                    <div className="flex items-center gap-2">
-                      <Link href={`/dashboard/reports/${encodeURIComponent(r.id)}`} className="truncate text-sm font-medium text-neutral-900 hover:underline">
-                        {r.title || `Report ${r.id}`}
-                      </Link>
-                      <Badge tone="neutral">{r.id}</Badge>
-                    </div>
-                    <div className="mt-1 flex flex-wrap items-center gap-3 text-xs text-neutral-500">
-                      <span>{r.date ? new Date(r.date).toLocaleString() : "—"}</span>
-                      <span className="hidden md:inline text-neutral-300">•</span>
-                      <span className="flex items-center gap-2">
-                        <Badge tone="good">Good: {r.totals?.good ?? 0}</Badge>
-                        <Badge tone="issue">Issues: {r.totals?.issues ?? 0}</Badge>
-                        <Badge tone="warning">Suggestions: {r.totals?.suggestions ?? 0}</Badge>
-                      </span>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <ScorePill score={r.score} />
-                    <Link href={`/dashboard/reports/${encodeURIComponent(r.id)}`} className="rounded-lg border border-neutral-200 bg-white px-3 py-1.5 text-sm font-medium text-neutral-700 hover:bg-neutral-50">
-                      View
-                    </Link>
-                  </div>
-                </li>
-              ))}
-            </ul>
-          )}
-        </Section>
-
-      
-
-        <div className="mt-10 text-center text-xs text-neutral-500">
-          UIaudit — Overall report summary
+          </Link>
         </div>
       </div>
-    </div>
+
+      {/* KPIs */}
+      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        <Kpi label="Total Reports" value={count} hint="Generated audits" tone="neutral" icon={FiFileText} />
+        <Kpi label="Average Score" value={`${avgScore}`} hint="Overall quality score" tone="amber" icon={FiTrendingUp} />
+        <Kpi label="Total Highlights" value={totalGood} hint="Positive findings" tone="emerald" icon={FiCheckCircle} />
+        <Kpi label="Critical Issues" value={totalIssues} hint="Needs attention" tone="rose" icon={FiAlertCircle} />
+      </div>
+
+      {/* Reports List */}
+      <div className="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+        <div className="border-b border-slate-100 bg-slate-50/50 px-6 py-4 flex items-center justify-between">
+          <h3 className="font-semibold text-slate-900">Recent Audits</h3>
+          <div className="flex items-center gap-3">
+            <button className="flex items-center gap-2 text-xs font-medium text-slate-500 hover:text-indigo-600 transition-colors">
+              <FiFilter className="w-3 h-3" />
+              Filter
+            </button>
+            <select className="bg-transparent text-xs font-medium text-slate-500 outline-none cursor-pointer hover:text-indigo-600 transition-colors">
+              <option>Sort by: Newest</option>
+              <option>Sort by: Score</option>
+            </select>
+          </div>
+        </div>
+
+        {loading ? (
+          <div className="p-12 text-center">
+            <div className="inline-block animate-spin rounded-full h-8 w-8 border-4 border-slate-200 border-t-indigo-600"></div>
+            <p className="mt-4 text-sm text-slate-500">Loading reports...</p>
+          </div>
+        ) : error ? (
+          <div className="p-12 text-center text-rose-600">
+            <FiAlertCircle className="mx-auto h-8 w-8 mb-2" />
+            <p>Error loading reports: {error}</p>
+          </div>
+        ) : reports.length === 0 ? (
+          <div className="p-16 text-center">
+            <div className="mx-auto w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mb-4">
+              <FiFileText className="w-8 h-8 text-slate-400" />
+            </div>
+            <h3 className="text-lg font-medium text-slate-900">No reports yet</h3>
+            <p className="mt-1 text-slate-500 max-w-sm mx-auto">Upload your first design to generate a comprehensive audit report.</p>
+            <Link href="/dashboard/upload" className="mt-6 inline-flex items-center gap-2 text-indigo-600 font-medium hover:text-indigo-700 hover:underline">
+              Start your first audit <FiArrowRight />
+            </Link>
+          </div>
+        ) : (
+          <ul className="divide-y divide-slate-100">
+            {reports.map((r, i) => (
+              <motion.li
+                key={r.id}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: i * 0.05 }}
+                className="group flex flex-col gap-4 p-6 transition-colors hover:bg-slate-50/50 sm:flex-row sm:items-center sm:justify-between"
+              >
+                <div className="flex items-start gap-4">
+                  <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600 font-bold text-lg">
+                    {r.score ?? "?"}
+                  </div>
+                  <div>
+                    <Link href={`/dashboard/reports/${encodeURIComponent(r.id)}`} className="font-semibold text-slate-900 hover:text-indigo-600 transition-colors">
+                      {r.title}
+                    </Link>
+                    <div className="mt-1 flex flex-wrap items-center gap-3 text-xs text-slate-500">
+                      <span className="flex items-center gap-1">
+                        <FiClock className="w-3 h-3" />
+                        {r.date ? new Date(r.date).toLocaleDateString() : "Unknown date"}
+                      </span>
+                      <span className="hidden sm:inline text-slate-300">•</span>
+                      <div className="flex gap-2">
+                        <span className="text-emerald-600 font-medium">{r.totals?.good ?? 0} Good</span>
+                        <span className="text-rose-600 font-medium">{r.totals?.issues ?? 0} Issues</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-between gap-6 sm:justify-end">
+                  <div className="w-32 hidden sm:block">
+                    <ScorePill score={r.score} />
+                  </div>
+                  <Link
+                    href={`/dashboard/reports/${encodeURIComponent(r.id)}`}
+                    className="flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition-all hover:border-indigo-200 hover:text-indigo-600 hover:shadow-sm"
+                  >
+                    View Report
+                    <FiArrowRight className="w-4 h-4" />
+                  </Link>
+                </div>
+              </motion.li>
+            ))}
+          </ul>
+        )}
+      </div>
+    </motion.div>
   );
 }

@@ -3,25 +3,35 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
-import { FiHome, FiUpload, FiBarChart2, FiUsers, FiSettings, FiLogOut, FiBell, FiUser, FiSearch } from 'react-icons/fi';
-import { Lobster } from 'next/font/google';
-import { Lato } from 'next/font/google';
+import { FiHome, FiUpload, FiBarChart2, FiUsers, FiSettings, FiLogOut, FiBell, FiSearch, FiMenu, FiX } from 'react-icons/fi';
+import { Outfit, Inter } from 'next/font/google';
+import { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 
-const lobster = Lobster({
-  subsets: ['latin'], // specify subsets
-  weight: '400', 
-  color: 'blue',    // font weight, Lobster usually has 400 only
+const outfit = Outfit({
+  subsets: ['latin'],
+  weight: ['400', '500', '600', '700'],
+  variable: '--font-outfit',
 });
 
-const lato = Lato({
-  subsets: ['latin'],       // Include subsets you need
-  weight: ['400', '700'],   // Load normal and bold weights
-  style: ['normal', 'italic'], // (optional) if you want italic styles
-  display: 'swap',          // Recommended for performance
+const inter = Inter({
+  subsets: ['latin'],
+  weight: ['400', '500', '600'],
+  variable: '--font-inter',
 });
 
 export default function DashboardLayout({ children }) {
   const pathname = usePathname();
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 10);
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   const menuItems = [
     { name: 'Dashboard', href: '/dashboard', icon: FiHome },
@@ -29,7 +39,6 @@ export default function DashboardLayout({ children }) {
     { name: 'Reports', href: '/dashboard/reports', icon: FiBarChart2 },
     { name: 'Team', href: '/dashboard/team', icon: FiUsers },
     { name: 'Settings', href: '/dashboard/settings', icon: FiSettings },
-    { name: 'Logout', href: '/logout', icon: FiLogOut },
   ];
 
   const getPageName = (path) => {
@@ -42,80 +51,147 @@ export default function DashboardLayout({ children }) {
   };
 
   return (
-    <div className="flex h-screen bg-gray-100">
+    <div className={`${inter.variable} ${outfit.variable} flex h-screen bg-slate-50/50 font-sans text-slate-900 selection:bg-indigo-100 selection:text-indigo-700`}>
       {/* Sidebar */}
-      <div className="w-64 bg-white border-r border-gray-200 flex flex-col">
-        {/* Logo and Company Name */}
-        <div className="pt-5 pl-6  border-b border-gray-200 flex items-center gap-2 ">
-          <Image src="/Logo/dashboardlogo3.png" alt="UI Audit Logo" width={45} height={45} className="mb-2" />
-          <h1 className={`${lobster.className} text-blue-500 text-xl`}>UI Audit</h1>
+      <aside
+        className={`fixed inset-y-0 left-0 z-50 w-72 bg-white/80 backdrop-blur-xl border-r border-slate-200/60 transform transition-transform duration-300 ease-out lg:translate-x-0 lg:static lg:inset-0 ${sidebarOpen ? 'translate-x-0 shadow-2xl' : '-translate-x-full'
+          }`}
+      >
+        {/* Logo */}
+        <div className="h-24 flex items-center px-8">
+          <Link href="/dashboard" className="flex items-center gap-3 group">
+            <div className="relative w-10 h-10 transition-transform group-hover:scale-105 duration-300">
+              <Image src="/Logo/dashboardlogo3.png" alt="UI Audit Logo" fill className="object-contain" />
+            </div>
+            <span className="font-outfit font-bold text-2xl text-slate-900 tracking-tight group-hover:text-indigo-600 transition-colors">UI Audit</span>
+          </Link>
+          <button
+            onClick={() => setSidebarOpen(false)}
+            className="lg:hidden ml-auto p-2 text-slate-400 hover:text-slate-600"
+          >
+            <FiX className="w-6 h-6" />
+          </button>
         </div>
 
-        {/* Menu Items */}
-        <nav className="flex-1 p-4">
-          <ul className="space-y-1">
-            {menuItems.map((item) => {
-              const Icon = item.icon;
-              const isActive = pathname === item.href;
-              return (
-                <li key={item.name}>
-                  <Link
-                    href={item.href}
-                    className={` ${lato.className} flex items-center space-x-3 px-2 py-3 rounded-lg transition-colors text-[13px] font-semibold ${
-                      isActive
-                        ? 'bg-blue-100   py-1 rounded-xs text-gray-700'
-                        : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
-                    }`}
-                  >
-                    <Icon className={isActive ? 'text-blue-500' : 'text-gray-400'  } size={17} />
-                    <span>{item.name}</span>
-                  </Link>
-                </li>
-              );
-            })}
-          </ul>
+        {/* Navigation */}
+        <nav className="px-4 space-y-1.5 mt-2">
+          {menuItems.map((item) => {
+            const Icon = item.icon;
+            const isActive = pathname === item.href;
+            return (
+              <Link
+                key={item.name}
+                href={item.href}
+                onClick={() => setSidebarOpen(false)}
+                className={`group relative flex items-center gap-3.5 px-4 py-3.5 rounded-xl transition-all duration-300 font-medium text-[0.95rem] ${isActive
+                  ? 'text-indigo-600 bg-indigo-50/80 shadow-sm shadow-indigo-100'
+                  : 'text-slate-500 hover:bg-slate-50 hover:text-slate-900'
+                  }`}
+              >
+                {isActive && (
+                  <motion.div
+                    layoutId="activeTab"
+                    className="absolute inset-0 bg-indigo-50/80 rounded-xl"
+                    initial={false}
+                    transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                    style={{ zIndex: -1 }}
+                  />
+                )}
+                <Icon className={`w-5 h-5 transition-colors duration-300 ${isActive ? 'text-indigo-600' : 'text-slate-400 group-hover:text-slate-600'}`} />
+                <span>{item.name}</span>
+              </Link>
+            );
+          })}
         </nav>
-      </div>
 
-      {/* Main Content Area */}
-      <div className="flex-1 flex flex-col">
-        {/* Top Headbar */}
-        <header className="bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
-          {/* Left: Logo, Name, and Breadcrumb */}
-          <div className="flex items-center space-x-4">
-            
-            <h1 className={`${lobster.className} text-blue-500 text-lg`}>Home</h1>
-            <span className={`${lato.className} text-gray-600 text-sm`}>/ {getPageName(pathname)}</span>
-          </div>
+        {/* Bottom Actions */}
+        <div className="absolute bottom-0 left-0 right-0 p-6 border-t border-slate-100/80 bg-gradient-to-t from-white to-transparent">
+          <Link
+            href="/logout"
+            className="flex items-center gap-3 px-4 py-3.5 rounded-xl text-slate-500 hover:bg-rose-50 hover:text-rose-600 transition-all duration-200 font-medium text-sm group"
+          >
+            <FiLogOut className="w-5 h-5 transition-transform group-hover:-translate-x-1" />
+            <span>Sign Out</span>
+          </Link>
+        </div>
+      </aside>
 
-          {/* Center: Search Bar */}
-          <div className="flex-1 max-w-md mx-4">
-            <div className="relative">
-              <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-              <input
-                type="text"
-                placeholder="Search the dashboard"
-                className={`${lato.className} w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent placeholder:text-xs`}
-              />
+      {/* Overlay for mobile */}
+      <AnimatePresence>
+        {sidebarOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-slate-900/20 backdrop-blur-sm z-40 lg:hidden"
+            onClick={() => setSidebarOpen(false)}
+          />
+        )}
+      </AnimatePresence>
+
+      {/* Main Content */}
+      <div className="flex-1 flex flex-col min-w-0 overflow-hidden bg-[#FAFAFA]">
+        {/* Header */}
+        <header className={`h-20 sticky top-0 z-30 px-4 lg:px-8 flex items-center justify-between transition-all duration-300 ${scrolled || true ? 'bg-white/70 backdrop-blur-xl border-b border-slate-200/60 supports-[backdrop-filter]:bg-white/60' : 'bg-transparent'
+          }`}>
+          <div className="flex items-center gap-4">
+            <button
+              onClick={() => setSidebarOpen(true)}
+              className="lg:hidden p-2 -ml-2 text-slate-500 hover:bg-slate-100 rounded-xl transition-colors"
+            >
+              <FiMenu className="w-6 h-6" />
+            </button>
+
+            <div className="flex flex-col">
+              <h1 className="font-outfit font-bold text-xl text-slate-900 tracking-tight">{getPageName(pathname)}</h1>
+              <span className="text-xs text-slate-500 font-medium hidden sm:block">Overview & Analytics</span>
             </div>
           </div>
 
-          {/* Right: Notifications and User */}
-          <div className="flex items-center space-x-4">
-            <button className="relative p-2 text-gray-600 hover:text-gray-800">
-              <FiBell className="w-6 h-6" />
-              <span className="absolute top-0 right-0 bg-blue-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">3</span>
-            </button>
+          <div className="flex items-center gap-3 lg:gap-6">
+            {/* Search */}
+            <div className="hidden md:flex relative w-64 lg:w-96 group">
+              <FiSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-indigo-500 transition-colors w-4 h-4" />
+              <input
+                type="text"
+                placeholder="Search projects, reports..."
+                className="w-full pl-11 pr-4 py-2.5 bg-slate-100/50 border border-transparent hover:bg-white hover:border-slate-200 focus:bg-white focus:border-indigo-200 focus:ring-4 focus:ring-indigo-500/10 rounded-xl text-sm font-medium text-slate-700 placeholder:text-slate-400 transition-all duration-200 outline-none"
+              />
+            </div>
 
-            <div className="">
-             <Image src="/images/manxa.png" alt="UI Audit Logo" width={45} height={45} className="mb-2 w-9 h-9 bg-gray-300 rounded-full" />
+            <div className="flex items-center gap-3">
+              {/* Notifications */}
+              <button className="relative p-2.5 text-slate-500 hover:bg-slate-100 hover:text-indigo-600 rounded-full transition-all duration-200">
+                <FiBell className="w-5 h-5" />
+                <span className="absolute top-2.5 right-3 w-2 h-2 bg-rose-500 rounded-full ring-2 ring-white"></span>
+              </button>
+
+              {/* Profile */}
+              <div className="flex items-center gap-3 pl-3 lg:pl-6 lg:border-l border-slate-200/60">
+                <div className="text-right hidden md:block">
+                  <p className="text-sm font-semibold text-slate-900 leading-none">Alex Morgan</p>
+                  <p className="text-xs text-slate-500 mt-1">Admin Workspace</p>
+                </div>
+                <button className="relative group">
+                  <div className="absolute inset-0 bg-indigo-500 rounded-full blur opacity-20 group-hover:opacity-40 transition-opacity"></div>
+                  <Image
+                    src="/images/manxa.png"
+                    alt="Profile"
+                    width={40}
+                    height={40}
+                    className="relative w-10 h-10 rounded-full object-cover ring-2 ring-white shadow-sm transition-transform group-hover:scale-105"
+                  />
+                </button>
+              </div>
             </div>
           </div>
         </header>
 
-        {/* Main Content */}
-        <main className="flex-1 p-6 bg-white overflow-auto">
-          {children}
+        {/* Content Scroll Area */}
+        <main className="flex-1 overflow-y-auto p-4 lg:p-8 scroll-smooth">
+          <div className="max-w-7xl mx-auto space-y-8">
+            {children}
+          </div>
         </main>
       </div>
     </div>

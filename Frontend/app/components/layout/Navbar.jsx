@@ -52,7 +52,7 @@ const Navbar = () => {
 
           {/* Get Started Button */}
           <Link
-            href="/get-started"
+            href="/login"
             className="flex items-center space-x-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white px-6 py-2 rounded-full font-semibold hover:from-blue-600 hover:to-purple-700 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl"
           >
             <IoRocketOutline className="w-5 h-5 animate-pulse" />

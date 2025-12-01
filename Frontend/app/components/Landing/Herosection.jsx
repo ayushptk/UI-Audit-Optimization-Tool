@@ -51,7 +51,7 @@ const Herosection = () => {
 
       <Prism
 
-    animationType="hover"
+    animationType="rotate"
 
     timeScale={0.5}
 
@@ -82,7 +82,6 @@ const Herosection = () => {
   variants={itemVariants}
 >
   <div>
-
     <span className="text-[16px] border border-slate-700  px-4 py-3 rounded-full font-small">#1 Audit Platform</span>
   </div>
   

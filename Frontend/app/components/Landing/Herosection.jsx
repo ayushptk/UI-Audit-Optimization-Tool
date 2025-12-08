@@ -3,11 +3,14 @@
 import React from 'react';
 import { FaArrowRight } from 'react-icons/fa';
 import { motion } from 'framer-motion';
+import { useRouter } from 'next/navigation';
 import LiquidEther from './Liquidether';
 import MagnetizeButton from './MagnetizeButton';
 import Prism from './Prism';
 import TrueFocus from './TrueFocus';
 const Herosection = () => {
+  const router = useRouter();
+
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
@@ -44,32 +47,32 @@ const Herosection = () => {
   };
 
   return (
-    <section className="relative py-20 px-4 min-h-screen flex items-center">
+    <section className="relative py-20 px-4 min-h-screen flex items-center bg-white">
       <div style={{ width: '100%', height: '100vh', position: 'absolute', top: 0, left: 0 }}>
 
-     
 
-      <Prism
 
-    animationType="rotate"
+        <Prism
 
-    timeScale={0.5}
+          animationType="rotate"
 
-    height={3.5}
+          timeScale={0.5}
 
-    baseWidth={5.5}
+          height={3.5}
 
-    scale={3.6}
+          baseWidth={5.5}
 
-    hueShift={0}
+          scale={3.6}
 
-    colorFrequency={1}
+          hueShift={0}
 
-    noise={0}
+          colorFrequency={1}
 
-    glow={1}
+          noise={0}
 
-  />
+          glow={1}
+
+        />
       </div>
       <motion.div
         className="relative z-10 max-w-6xl mx-auto text-center"
@@ -77,33 +80,33 @@ const Herosection = () => {
         initial="hidden"
         animate="visible"
       >
-     <motion.h1
-  className="text-5xl md:text-7xl font-bold text-gray-900 mb-6 leading-tight mt-8"
-  variants={itemVariants}
->
-  <div>
-    <span className="text-[16px] border border-slate-700  px-4 py-3 rounded-full font-small">#1 Audit Platform</span>
-  </div>
-  
-  <span className="">
-    Revolutionize Your UI with  Automated{' '}
-    <motion.span
-      className="text-indigo-600 inline-block align-baseline"
-      initial={{ color: '#6B7280' }}
-      animate={{ color: '#4F46E5' }}
-      transition={{ duration: 1, delay: 1 }}
-    >
-      <TrueFocus
-        sentence="UX Insights"
-        manualMode={false}
-        blurAmount={5}
-        borderColor="red"
-        animationDuration={2}
-        pauseBetweenAnimations={1}
-      />
-    </motion.span>
-  </span>
-</motion.h1>
+        <motion.h1
+          className="text-5xl md:text-7xl font-bold text-gray-900 mb-6 leading-tight mt-8"
+          variants={itemVariants}
+        >
+          <div>
+            <span className="text-[16px] border border-slate-700  px-4 py-3 rounded-full font-small">#1 Audit Platform</span>
+          </div>
+
+          <span className="">
+            Revolutionize Your UI with  Automated{' '}
+            <motion.span
+              className="text-indigo-600 inline-block align-baseline"
+              initial={{ color: '#6B7280' }}
+              animate={{ color: '#4F46E5' }}
+              transition={{ duration: 1, delay: 1 }}
+            >
+              <TrueFocus
+                sentence="UX Insights"
+                manualMode={false}
+                blurAmount={5}
+                borderColor="red"
+                animationDuration={2}
+                pauseBetweenAnimations={1}
+              />
+            </motion.span>
+          </span>
+        </motion.h1>
         <motion.p
           className="text-xl md:text-xl text-gray-600 mb-10 max-w-3xl mx-auto"
           variants={itemVariants}
@@ -115,14 +118,15 @@ const Herosection = () => {
           variants={containerVariants}
         >
           <motion.button
-            className="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2 rounded-lg font-bold text-lg transition duration-300 flex items-center justify-center gap-2"
+            className="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2 rounded-lg font-bold text-lg transition duration-300 flex items-center justify-center gap-2 cursor-pointer"
             variants={buttonVariants}
             whileHover="hover"
+            onClick={() => router.push('/login')}
           >
             Get Started Free <FaArrowRight />
           </motion.button>
           <motion.button
-            className="border-2 border-gray-300 hover:border-gray-400 text-gray-700 px-6 py-2 rounded-lg font-bold text-lg transition duration-300"
+            className="border-2 border-gray-300 hover:border-gray-400 text-gray-700 px-6 py-2 rounded-lg font-bold text-lg transition duration-300  cursor-pointer"
             variants={buttonVariants}
             whileHover="hover"
           >

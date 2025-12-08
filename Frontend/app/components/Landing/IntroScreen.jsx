@@ -1,167 +1,120 @@
 "use client";
 import { useState, useEffect } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 
 export default function IntroLayout({ children }) {
   const [showIntro, setShowIntro] = useState(true);
-  const [logoMoved, setLogoMoved] = useState(false);
 
   useEffect(() => {
-    const logoTimer = setTimeout(() => setLogoMoved(true), 1500);
-    const introTimer = setTimeout(() => setShowIntro(false), 3500);
-    
-    return () => {
-      clearTimeout(logoTimer);
-      clearTimeout(introTimer);
-    };
+    // Total duration of the intro sequence
+    const timer = setTimeout(() => setShowIntro(false), 3000);
+    return () => clearTimeout(timer);
   }, []);
 
   return (
     <>
-      {showIntro ? (
-        <div className="fixed inset-0 flex items-center justify-center bg-gradient-to-br from-indigo-50 via-white to-purple-50 overflow-hidden">
-          {/* Animated background ripples */}
+      <AnimatePresence mode="wait">
+        {showIntro ? (
           <motion.div
-            className="absolute inset-0"
+            key="intro"
+            className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-white"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
+            exit={{
+              y: -50,
+              opacity: 0,
+              transition: { duration: 0.8, ease: [0.76, 0, 0.24, 1] },
+            }}
           >
-            {[...Array(3)].map((_, i) => (
+            <div className="flex flex-col items-center gap-8">
+              {/* Logo Container */}
               <motion.div
-                key={i}
-                className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-indigo-200"
-                initial={{ width: 0, height: 0, opacity: 0.8 }}
+                className="relative flex items-center justify-center w-24 h-24 bg-white rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] ring-1 ring-black/5"
+                initial={{ scale: 0.8, opacity: 0, filter: "blur(10px)" }}
                 animate={{
-                  width: [0, 800, 1200],
-                  height: [0, 800, 1200],
-                  opacity: [0.6, 0.3, 0],
+                  scale: 1,
+                  opacity: 1,
+                  filter: "blur(0px)",
                 }}
                 transition={{
-                  duration: 2,
-                  delay: i * 0.4,
-                  ease: "easeOut",
-                  repeat: Infinity,
-                  repeatDelay: 0.5,
-                }}
-              />
-            ))}
-          </motion.div>
-
-          {/* Content container */}
-          <div className="relative z-10 flex items-center gap-6">
-            {/* Logo */}
-            <motion.div
-              initial={{ opacity: 0, scale: 0.5, rotate: -180 }}
-              animate={
-                logoMoved
-                  ? { opacity: 1, scale: 1, rotate: 0, x: 0 }
-                  : { opacity: 1, scale: 1, rotate: 0 }
-              }
-              transition={{
-                duration: 1,
-                type: "spring",
-                stiffness: 200,
-                damping: 20,
-              }}
-            >
-              <motion.div
-                animate={{
-                  y: [0, -10, 0],
-                }}
-                transition={{
-                  duration: 2,
-                  repeat: Infinity,
-                  ease: "easeInOut",
+                  duration: 1.2,
+                  ease: [0.16, 1, 0.3, 1], // Apple-style spring ease
                 }}
               >
-                <div className="w-28 h-28 bg-gradient-to-br from-white-500 to-white-600 rounded-2xl shadow-2xl flex items-center justify-center">
-                  <img src="/Logo/Uisearchicon.png" alt="Logo" />
-                </div>
+                <motion.img
+                  src="/Logo/Uisearchicon.png"
+                  alt="Logo"
+                  className="w-12 h-12 object-contain opacity-90"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.2, duration: 0.8 }}
+                />
               </motion.div>
-            </motion.div>
 
-            {/* Text with ripple effect */}
-            <motion.div
-              initial={{ opacity: 0, x: -50 }}
-              animate={logoMoved ? { opacity: 1, x: 0 } : { opacity: 0, x: -50 }}
-              transition={{ duration: 0.8, delay: 0.3 }}
-              className="overflow-hidden"
-            >
-              <motion.h1
-                className="text-7xl font-extrabold bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-600 bg-clip-text text-transparent relative"
-                style={{
-                  backgroundSize: "200% auto",
-                }}
-                animate={{
-                  backgroundPosition: ["0% center", "200% center"],
-                }}
-                transition={{
-                  duration: 3,
-                  repeat: Infinity,
-                  ease: "linear",
-                }}
-              >
-                {"UI AUDIT".split("").map((char, index) => (
-                  <motion.span
-                    key={index}
-                    className="inline-block"
-                    initial={{ opacity: 0, y: 50 }}
-                    animate={{ opacity: 1, y: 0 }}
+              {/* Text Reveal */}
+              <div className="flex flex-col items-center gap-2">
+                <div className="overflow-hidden">
+                  <motion.h1
+                    className="text-3xl font-semibold tracking-[-0.04em] text-zinc-900"
+                    initial={{ y: "100%" }}
+                    animate={{ y: 0 }}
                     transition={{
-                      duration: 0.5,
-                      delay: logoMoved ? index * 0.08 : 0,
-                      type: "spring",
-                      stiffness: 200,
+                      delay: 0.4,
+                      duration: 0.8,
+                      ease: [0.16, 1, 0.3, 1],
                     }}
-                    whileHover={{ scale: 1.2, color: "#8b5cf6" }}
                   >
-                    {char === " " ? "\u00A0" : char}
-                  </motion.span>
-                ))}
-              </motion.h1>
+                    UI AUDIT
+                  </motion.h1>
+                </div>
 
-              {/* Underline animation */}
-              <motion.div
-                className="h-1 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-full mt-2"
-                initial={{ width: 0 }}
-                animate={logoMoved ? { width: "100%" } : { width: 0 }}
-                transition={{ duration: 0.8, delay: 1 }}
-              />
-            </motion.div>
-          </div>
+                {/* Minimal Loading Line */}
+                <motion.div
+                  className="h-[2px] bg-zinc-100 w-24 rounded-full overflow-hidden mt-2"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.8, duration: 0.5 }}
+                >
+                  <motion.div
+                    className="h-full bg-zinc-900"
+                    initial={{ width: "0%" }}
+                    animate={{ width: ["0%", "25%", "100%"] }}
+                    transition={{
+                      duration: 2,
+                      times: [0, 0.3, 1],
+                      ease: "easeInOut",
+                      delay: 0.8,
+                    }}
+                  />
+                </motion.div>
 
-          {/* Particle effects */}
-          {[...Array(20)].map((_, i) => (
-            <motion.div
-              key={i}
-              className="absolute w-2 h-2 bg-indigo-400 rounded-full"
-              initial={{
-                x: "50vw",
-                y: "50vh",
-                opacity: 0,
-              }}
-              animate={{
-                x: `${Math.random() * 100}vw`,
-                y: `${Math.random() * 100}vh`,
-                opacity: [0, 1, 0],
-              }}
-              transition={{
-                duration: 2 + Math.random() * 2,
-                delay: Math.random() * 2,
-                repeat: Infinity,
-              }}
-            />
-          ))}
-        </div>
-      ) : (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.5 }}
-        >
-          {children}
-        </motion.div>
-      )}
+                {/* Loading Text */}
+                <motion.p
+                  className="text-xs text-zinc-400 mt-2 font-medium"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 1, duration: 0.5 }}
+                >
+                  Loading...
+                </motion.p>
+              </div>
+            </div>
+          </motion.div>
+        ) : (
+          <motion.div
+            key="content"
+            className="min-h-screen"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{
+              duration: 0.8,
+              ease: [0.16, 1, 0.3, 1],
+            }}
+          >
+            {children}
+          </motion.div>
+        )}
+      </AnimatePresence>
     </>
   );
 }

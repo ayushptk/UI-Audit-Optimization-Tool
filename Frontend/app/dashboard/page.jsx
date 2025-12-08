@@ -33,7 +33,7 @@ export default function DashboardPage() {
             {/* Welcome Section */}
             <motion.div variants={item} className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pb-2 border-b border-slate-200/60">
                 <div>
-                    <h2 className="text-3xl font-bold font-outfit text-slate-900 tracking-tight">Welcome back, Alex! 👋</h2>
+                    <h2 className="text-3xl font-bold font-outfit text-slate-900 tracking-tight">Welcome back, Ayush! 👋</h2>
                     <p className="text-slate-500 mt-2 text-base font-medium">Here's what's happening with your projects today.</p>
                 </div>
                 <div className="flex gap-3">

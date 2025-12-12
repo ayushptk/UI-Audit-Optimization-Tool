@@ -38,9 +38,8 @@ export default function DashboardLayout({ children }) {
 
   const menuItems = [
     { name: 'Dashboard', href: '/dashboard', icon: MdDashboardCustomize },
-    { name: 'Upload Design', href: '/dashboard/upload', icon: TbWorldUpload},
+    { name: 'Upload Design', href: '/dashboard/upload', icon: TbWorldUpload },
     { name: 'Reports', href: '/dashboard/reports', icon: TbReportSearch },
-    { name: 'Team', href: '/dashboard/team', icon: BsMicrosoftTeams },
     { name: 'Settings', href: '/dashboard/settings', icon: FiSettings },
   ];
 
@@ -64,8 +63,8 @@ export default function DashboardLayout({ children }) {
           {/* Logo */}
           <div className="h-24 flex items-center px-8 border-b border-slate-50/50">
             <Link href="/dashboard" className="flex items-center gap-3 group">
-              <div className="relative w-10 h-10 flex items-center justify-center bg-indigo-600 rounded-xl shadow-lg shadow-indigo-200 group-hover:scale-105 transition-transform duration-300">
-                <Image src="/Logo/dashboardlogo3.png" alt="UI Audit Logo" fill className="object-contain p-1.5 invert brightness-0" />
+              <div className="relative w-10 h-10 flex items-center justify-center  bg-indigo-600 rounded-xl shadow-lg shadow-indigo-200 group-hover:scale-105 transition-transform duration-300">
+                <Image src="/Logo/Uisearchicon.png" alt="UI Audit Logo" fill className="object-contain p-1.5 invert brightness-0" />
               </div>
               <span className="font-outfit font-bold text-2xl text-slate-900 tracking-tight">UI Audit</span>
             </Link>

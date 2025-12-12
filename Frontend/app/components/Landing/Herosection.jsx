@@ -5,7 +5,7 @@ import { FaArrowRight } from 'react-icons/fa';
 import { motion } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import LiquidEther from './Liquidether';
-import MagnetizeButton from './MagnetizeButton';
+import MagnetizeButton from './magnetize-button';
 import Prism from './Prism';
 import TrueFocus from './TrueFocus';
 const Herosection = () => {
@@ -117,6 +117,7 @@ const Herosection = () => {
           className="flex  sm:flex-row justify-center gap-4 "
           variants={containerVariants}
         >
+     
           <motion.button
             className="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2 rounded-lg font-bold text-lg transition duration-300 flex items-center justify-center gap-2 cursor-pointer"
             variants={buttonVariants}
@@ -125,6 +126,9 @@ const Herosection = () => {
           >
             Get Started Free <FaArrowRight />
           </motion.button>
+       
+
+
           <motion.button
             className="border-2 border-gray-300 hover:border-gray-400 text-gray-700 px-6 py-2 rounded-lg font-bold text-lg transition duration-300  cursor-pointer"
             variants={buttonVariants}
@@ -132,6 +136,8 @@ const Herosection = () => {
           >
             Learn More
           </motion.button>
+
+
         </motion.div>
       </motion.div>
     </section>

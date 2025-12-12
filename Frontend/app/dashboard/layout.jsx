@@ -11,6 +11,10 @@ import { MdDashboardCustomize } from "react-icons/md";
 import { TbWorldUpload } from "react-icons/tb";
 import { TbReportSearch } from "react-icons/tb";
 import { BsMicrosoftTeams } from "react-icons/bs";
+import { useSelector, useDispatch } from 'react-redux';
+import { fetchUserProfile } from '../lib/auth';
+import { setUser, setCredentials } from '../redux/authSlice';
+
 const outfit = Outfit({
   subsets: ['latin'],
   weight: ['400', '500', '600', '700'],
@@ -27,6 +31,36 @@ export default function DashboardLayout({ children }) {
   const pathname = usePathname();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+
+  const dispatch = useDispatch();
+  const { user, token } = useSelector((state) => state.auth);
+
+  // Restore token from localStorage if missing in Redux
+  useEffect(() => {
+    if (!token && typeof window !== 'undefined') {
+      const storedToken = localStorage.getItem('access_token');
+      if (storedToken) {
+        // We can temporarily set a dummy user or just the token to trigger the next effect
+        dispatch(setCredentials({ token: storedToken, user: null }));
+      }
+    }
+  }, [token, dispatch]);
+
+  useEffect(() => {
+    if (token) {
+      if (!user) {
+        fetchUserProfile(token)
+          .then(userData => {
+            const userWithCorrectName = { ...userData, name: userData.username || userData.name };
+            dispatch(setUser(userWithCorrectName));
+          })
+          .catch(err => {
+            console.error("Failed to fetch user:", err);
+            // If token is invalid, maybe clear it?
+          });
+      }
+    }
+  }, [token, user, dispatch]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -199,8 +233,8 @@ export default function DashboardLayout({ children }) {
               {/* Profile */}
               <div className="flex items-center gap-3 pl-3 lg:pl-6 lg:border-l border-slate-200">
                 <div className="text-right hidden md:block">
-                  <p className="text-sm font-semibold text-slate-900 leading-none">Alex Morgan</p>
-                  <p className="text-xs text-slate-500 mt-1">Admin</p>
+                  <p className="text-sm font-semibold text-slate-900 leading-none">{user?.name || user?.username || "Guest User"}</p>
+                  <p className="text-xs text-slate-500 mt-1">{user?.email || "User"}</p>
                 </div>
                 <button className="relative group">
                   <div className="absolute inset-0 bg-indigo-500 rounded-full blur opacity-20 group-hover:opacity-40 transition-opacity"></div>

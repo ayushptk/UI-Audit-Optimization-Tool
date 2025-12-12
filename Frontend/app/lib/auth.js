@@ -5,9 +5,9 @@ export async function login(email, password) {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ email, password }),
-    
+
   });
-  console.log("The data is " +res);
+  console.log("The data is " + res);
 
   if (!res.ok) throw new Error("Invalid login");
 
@@ -22,6 +22,20 @@ export async function registerUser(username, email, password) {
   });
 
   if (!res.ok) throw new Error("Register failed");
+
+  return res.json();
+}
+
+export async function fetchUserProfile(token) {
+  const res = await fetch(`${BASE_URL}/auth/me`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${token}`
+    },
+  });
+
+  if (!res.ok) throw new Error("Failed to fetch user profile");
 
   return res.json();
 }

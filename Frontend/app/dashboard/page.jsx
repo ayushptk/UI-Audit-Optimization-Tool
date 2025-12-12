@@ -6,6 +6,10 @@ import TrafficSources from "../components/dashboard/trafficsources";
 import RecentAudits from "../components/dashboard/recentaudits";
 import { motion } from "framer-motion";
 import { FiDownload, FiPlus } from "react-icons/fi";
+import { useSelector, useDispatch } from "react-redux";
+import { useEffect } from "react";
+import { fetchUserProfile } from "../lib/auth";
+import { setUser } from "../redux/authSlice";
 
 const container = {
     hidden: { opacity: 0 },
@@ -23,6 +27,21 @@ const item = {
 };
 
 export default function DashboardPage() {
+    const dispatch = useDispatch();
+    const { user, token } = useSelector((state) => state.auth);
+
+    useEffect(() => {
+        if (token && !user) {
+            fetchUserProfile(token).then((userData) => {
+                dispatch(setUser(userData));
+            }).catch((error) => {
+                console.error("Failed to fetch user profile:", error);
+            });
+        }
+    }, [token, user, dispatch]);
+
+    const displayName = user ? (user.username || user.name).charAt(0).toUpperCase() + (user.username || user.name).slice(1) : 'User';
+
     return (
         <motion.div
             variants={container}
@@ -33,7 +52,7 @@ export default function DashboardPage() {
             {/* Welcome Section */}
             <motion.div variants={item} className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pb-2 border-b border-slate-200/60">
                 <div>
-                    <h2 className="text-3xl font-bold font-outfit text-slate-900 tracking-tight">Welcome back, Ayush! 👋</h2>
+                    <h2 className="text-3xl font-bold font-outfit text-slate-900 tracking-tight">Welcome back, {displayName}! 👋</h2>
                     <p className="text-slate-500 mt-2 text-base font-medium">Here's what's happening with your projects today.</p>
                 </div>
                 <div className="flex gap-3">

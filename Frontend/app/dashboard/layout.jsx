@@ -87,7 +87,7 @@ export default function DashboardLayout({ children }) {
   };
 
   return (
-    <div className={`${inter.variable} ${outfit.variable} flex h-screen bg-[#F8FAFC] font-sans text-slate-900 selection:bg-indigo-500/30 selection:text-indigo-900`}>
+    <div className={`${inter.variable} ${outfit.variable} flex h-screen bg-white font-sans text-slate-900 selection:bg-indigo-500/30 selection:text-indigo-900`}>
       {/* Sidebar */}
       <aside
         className={`fixed inset-y-0 left-0 z-50 w-65 bg-white border-r border-slate-100 shadow-[4px_0_24px_-12px_rgba(0,0,0,0.02)] transform transition-transform duration-300 ease-out lg:translate-x-0 lg:static lg:inset-0 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'
@@ -252,7 +252,7 @@ export default function DashboardLayout({ children }) {
         </header>
 
         {/* Content Scroll Area */}
-        <main className="flex-1 overflow-y-auto p-4 lg:p-8 scroll-smooth">
+        <main className="flex-1 overflow-y-auto p-4 lg:p-4 scroll-smooth">
           <div className="max-w-7xl mx-auto space-y-8">
             {children}
           </div>

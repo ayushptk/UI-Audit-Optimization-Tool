@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { FiExternalLink, FiMoreVertical, FiArrowRight } from 'react-icons/fi';
+import { FiExternalLink, FiMoreVertical, FiArrowRight, FiEye, FiEdit, FiTrash } from 'react-icons/fi';
 
 const audits = [
     {
@@ -12,6 +12,7 @@ const audits = [
         date: '2 hours ago',
         status: 'Completed',
         image: 'https://ui-avatars.com/api/?name=E+C&background=6366f1&color=fff',
+        related: 'View Related Audits',
     },
     {
         id: 2,
@@ -21,6 +22,7 @@ const audits = [
         date: '5 hours ago',
         status: 'In Progress',
         image: 'https://ui-avatars.com/api/?name=S+L&background=10b981&color=fff',
+        related: 'View Related Audits',
     },
     {
         id: 3,
@@ -30,6 +32,7 @@ const audits = [
         date: '1 day ago',
         status: 'Completed',
         image: 'https://ui-avatars.com/api/?name=P+S&background=f59e0b&color=fff',
+        related: 'View Related Audits',
     },
     {
         id: 4,
@@ -39,6 +42,7 @@ const audits = [
         date: '2 days ago',
         status: 'Needs Review',
         image: 'https://ui-avatars.com/api/?name=B+T&background=ef4444&color=fff',
+        related: 'View Related Audits',
     },
 ];
 
@@ -66,9 +70,9 @@ export default function RecentAudits() {
                     <thead>
                         <tr className="bg-slate-50/50 border-b border-slate-100">
                             <th className="px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">Project</th>
-                            <th className="px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">URL</th>
                             <th className="px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">Score</th>
                             <th className="px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">Date</th>
+                            <th className="px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">Related</th>
                             <th className="px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider text-right">Actions</th>
                         </tr>
                     </thead>
@@ -82,12 +86,6 @@ export default function RecentAudits() {
                                     </div>
                                 </td>
                                 <td className="px-6 py-4">
-                                    <a href={`https://${audit.url}`} target="_blank" rel="noreferrer" className="text-sm text-slate-500 hover:text-indigo-600 flex items-center gap-1.5 transition-colors">
-                                        {audit.url}
-                                        <FiExternalLink className="w-3 h-3" />
-                                    </a>
-                                </td>
-                                <td className="px-6 py-4">
                                     <span className={`inline-flex items-center justify-center px-2.5 py-1 rounded-full text-xs font-bold ring-1 ring-inset ${getScoreColor(audit.score)}`}>
                                         {audit.score}
                                     </span>
@@ -95,9 +93,18 @@ export default function RecentAudits() {
                                 <td className="px-6 py-4 text-sm text-slate-500">
                                     {audit.date}
                                 </td>
-                                <td className="px-6 py-4 text-right">
-                                    <button className="p-2 text-slate-400 hover:text-slate-600 rounded-lg hover:bg-white hover:shadow-sm transition-all opacity-0 group-hover:opacity-100">
-                                        <FiMoreVertical className="w-4 h-4" />
+                                <td className="px-6 py-4 text-sm text-slate-500">
+                                    {audit.related}
+                                </td>
+                                <td className="px-6 py-4 text-right flex gap-1 justify-end">
+                                    <button className="p-2 text-slate-400 hover:text-slate-600 rounded-lg hover:bg-white hover:shadow-sm transition-all">
+                                        <FiEye className="w-4 h-4" />
+                                    </button>
+                                    <button className="p-2 text-slate-400 hover:text-slate-600 rounded-lg hover:bg-white hover:shadow-sm transition-all">
+                                        <FiEdit className="w-4 h-4" />
+                                    </button>
+                                    <button className="p-2 text-slate-400 hover:text-slate-600 rounded-lg hover:bg-white hover:shadow-sm transition-all">
+                                        <FiTrash className="w-4 h-4" />
                                     </button>
                                 </td>
                             </tr>

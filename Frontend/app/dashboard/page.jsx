@@ -1,9 +1,10 @@
 'use client';
 
-import RevenueAnalyticsChart from "../components/dashboard/revenuechart";
+
 import StatsCard from "../components/dashboard/statscard";
-import TrafficSources from "../components/dashboard/trafficsources";
 import RecentAudits from "../components/dashboard/recentaudits";
+import UiScoreTrend from "../components/dashboard/uiscoretrend";
+import CategoryBreakdown from "../components/dashboard/categorybreakdown";
 import { motion } from "framer-motion";
 import { FiDownload, FiPlus } from "react-icons/fi";
 import { useSelector, useDispatch } from "react-redux";
@@ -16,14 +17,19 @@ const container = {
     show: {
         opacity: 1,
         transition: {
-            staggerChildren: 0.1
+            staggerChildren: 0.1,
+            delayChildren: 0.2
         }
     }
 };
 
 const item = {
-    hidden: { opacity: 0, y: 20 },
-    show: { opacity: 1, y: 0 }
+    hidden: { opacity: 0, y: 15 },
+    show: {
+        opacity: 1,
+        y: 0,
+        transition: { type: "spring", stiffness: 50, damping: 20 }
+    }
 };
 
 export default function DashboardPage() {
@@ -47,22 +53,22 @@ export default function DashboardPage() {
             variants={container}
             initial="hidden"
             animate="show"
-            className="space-y-8"
+            className="min-h-screen bg-white p-6 sm:p-8 space-y-10 max-w-[1600px] mx-auto"
         >
-            {/* Welcome Section */}
-            <motion.div variants={item} className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pb-2 border-b border-slate-200/60">
-                <div>
-                    <h2 className="text-3xl font-bold font-outfit text-slate-900 tracking-tight">Welcome back, {displayName}! 👋</h2>
-                    <p className="text-slate-500 mt-2 text-base font-medium">Here's what's happening with your projects today.</p>
+            {/* Header Section */}
+            <motion.div variants={item} className="flex flex-col sm:flex-row sm:items-end justify-between gap-6 pb-6 border-b border-slate-100">
+                <div className="space-y-1">
+                    <h2 className="text-3xl font-bold font-outfit text-slate-900 tracking-tight">Overview</h2>
+                    <p className="text-slate-500 text-base font-medium">Welcome back, {displayName}. Here's your audit performance.</p>
                 </div>
                 <div className="flex gap-3">
-                    <button className="flex items-center gap-2 px-5 py-2.5 bg-white border border-slate-200 text-slate-700 rounded-xl text-sm font-semibold hover:bg-slate-50 hover:border-slate-300 transition-all shadow-sm hover:shadow active:scale-95">
+                    <button className="flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 text-slate-600 rounded-lg text-sm font-semibold hover:bg-slate-50 hover:border-slate-300 transition-all shadow-sm active:translate-y-0.5">
                         <FiDownload className="w-4 h-4" />
-                        Download Report
+                        Export
                     </button>
-                    <button className="flex items-center gap-2 px-5 py-2.5 bg-indigo-600 text-white rounded-xl text-sm font-semibold hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-200 hover:shadow-indigo-300 active:scale-95">
+                    <button className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm font-semibold hover:bg-indigo-700 transition-all shadow-lg shadow-slate-200 hover:shadow-xl active:translate-y-0.5">
                         <FiPlus className="w-4 h-4" />
-                        New Project
+                        New Audit
                     </button>
                 </div>
             </motion.div>
@@ -73,22 +79,17 @@ export default function DashboardPage() {
             </motion.section>
 
             {/* Charts Section */}
-            <motion.section variants={item} className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                <div className="lg:col-span-2 space-y-8">
-                    <div className="bg-white rounded-2xl p-1 shadow-sm border border-slate-100">
-                        <RevenueAnalyticsChart />
-                    </div>
+            <motion.section variants={item} className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+                <div className="xl:col-span-2">
+                    <UiScoreTrend />
                 </div>
-                <div className="lg:col-span-1">
-                    <div className="bg-white rounded-2xl shadow-sm border border-slate-100 h-full">
-                        <TrafficSources />
-                    </div>
+                <div className="xl:col-span-1">
+                    <CategoryBreakdown />
                 </div>
             </motion.section>
-
-            {/* Recent Audits & Projects */}
+            {/* Recent Table */}
             <motion.section variants={item}>
-                <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+                <div className="bg-white rounded-2xl shadow-[0_2px_20px_rgba(0,0,0,0.02)] border border-slate-100 overflow-hidden">
                     <RecentAudits />
                 </div>
             </motion.section>

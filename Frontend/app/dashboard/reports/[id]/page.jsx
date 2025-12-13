@@ -76,7 +76,7 @@ function StatCard({ label, value, icon: Icon, color, delay }) {
           <p className="text-xs font-semibold uppercase tracking-wider text-gray-500">{label}</p>
           <div className="mt-2 flex items-baseline gap-1">
             <span className="text-3xl font-bold text-gray-900">{value}</span>
-            <span className="text-sm font-medium text-gray-400">/10</span>
+            <span className="text-sm font-medium text-gray-400">/100</span>
           </div>
         </div>
         <div className={`flex h-12 w-12 items-center justify-center rounded-xl ring-1 ${style} transition-transform group-hover:scale-110`}>
@@ -291,7 +291,7 @@ export default function ReportPage() {
               <Share2 className="h-4 w-4" />
               <span className="hidden sm:inline">Share</span>
             </button>
-            <button className="inline-flex items-center gap-2 rounded-lg bg-gray-900 px-3 py-2 text-sm font-medium text-white shadow-sm transition-all hover:bg-gray-800 hover:shadow-md">
+            <button className="inline-flex items-center gap-2 rounded-lg bg-indigo-600 px-3 py-2 text-sm font-medium text-white shadow-sm transition-all hover:bg-gray-800 hover:shadow-md">
               <Download className="h-4 w-4" />
               <span className="hidden sm:inline">Export Report</span>
             </button>
@@ -317,163 +317,163 @@ export default function ReportPage() {
           </div>
         </motion.div>
 
-        <div className="grid gap-8 lg:grid-cols-12">
-          {/* Left Column: Image Preview (Sticky on Desktop) */}
-          <div className="lg:col-span-5">
-            <motion.div variants={itemVariants} className="sticky top-24 space-y-6">
-              <div className="group relative overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm transition-all hover:shadow-md">
-                <div className="absolute inset-x-0 top-0 z-10 flex items-center gap-1.5 border-b border-gray-100 bg-gray-50/90 px-4 py-3 backdrop-blur-sm">
-                  <div className="h-3 w-3 rounded-full bg-rose-400/80"></div>
-                  <div className="h-3 w-3 rounded-full bg-amber-400/80"></div>
-                  <div className="h-3 w-3 rounded-full bg-emerald-400/80"></div>
-                  <div className="ml-auto flex items-center gap-2">
-                    <span className="text-xs font-medium text-gray-400">Preview</span>
-                    <Maximize2 className="h-3.5 w-3.5 text-gray-400" />
-                  </div>
-                </div>
-                <div className="relative aspect-[4/3] w-full bg-gray-100 pt-10">
-                  {imageUrl ? (
-                    <img
-                      src={imageUrl}
-                      alt="Analyzed Design"
-                      className="h-full w-full object-contain transition-transform duration-700 group-hover:scale-105"
-                    />
-                  ) : (
-                    <div className="flex h-full flex-col items-center justify-center gap-3 text-gray-400">
-                      <ImageIcon className="h-10 w-10 opacity-50" />
-                      <span className="text-sm font-medium">No preview available</span>
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              {/* Quick Summary Card */}
-              <div className="rounded-2xl border border-gray-200 bg-gradient-to-br from-indigo-500 to-purple-600 p-6 text-white shadow-lg">
-                <div className="mb-4 flex items-center gap-3">
+        <div className="space-y-8">
+          {/* Overall Score Section */}
+          <motion.div variants={itemVariants} className="rounded-2xl border border-gray-200 bg-gradient-to-br from-indigo-500 to-purple-600 p-8 text-white shadow-lg">
+            <div className="flex flex-col items-center justify-center text-center sm:flex-row sm:justify-between sm:text-left">
+              <div>
+                <div className="mb-2 flex items-center justify-center gap-3 sm:justify-start">
                   <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/20 backdrop-blur-md">
                     <TrendingUp className="h-5 w-5 text-white" />
                   </div>
-                  <h3 className="text-lg font-semibold">Overall Score</h3>
+                  <h3 className="text-2xl font-bold">Overall Score</h3>
                 </div>
-                <div className="flex items-baseline gap-2">
-                  <span className="text-5xl font-bold tracking-tight">
-                    {Math.round((kpi.typography + kpi.spacing + kpi.color + kpi.layout) / 4)}
-                  </span>
-                  <span className="text-lg font-medium text-white/80">/ 10</span>
-                </div>
-                <p className="mt-2 text-sm text-indigo-100">
+                <p className="max-w-xl text-indigo-100">
                   Based on AI analysis of typography, spacing, colors, and layout consistency.
+                  Your design is evaluated against modern UI standards.
                 </p>
               </div>
-            </motion.div>
+              <div className="mt-6 flex items-baseline gap-2 sm:mt-0">
+                <span className="text-6xl font-bold tracking-tight">
+                  {Math.round((kpi.typography + kpi.spacing + kpi.color + kpi.layout) / 4)}
+                </span>
+                <span className="text-xl font-medium text-white/80">/ 100</span>
+              </div>
+            </div>
+          </motion.div>
+
+          {/* KPI Cards */}
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            <StatCard label="Typography" value={kpi.typography} icon={Type} color="purple" delay={0.1} />
+            <StatCard label="Spacing" value={kpi.spacing} icon={MoveHorizontal} color="blue" delay={0.2} />
+            <StatCard label="Color Palette" value={kpi.color} icon={Palette} color="amber" delay={0.3} />
+            <StatCard label="Layout" value={kpi.layout} icon={Layout} color="emerald" delay={0.4} />
           </div>
 
-          {/* Right Column: KPIs & Analysis */}
-          <div className="lg:col-span-7 space-y-8">
-            {/* KPI Grid */}
-            <div className="grid grid-cols-2 gap-4 sm:grid-cols-2">
-              <StatCard label="Typography" value={kpi.typography} icon={Type} color="purple" />
-              <StatCard label="Spacing" value={kpi.spacing} icon={MoveHorizontal} color="blue" />
-              <StatCard label="Color Palette" value={kpi.color} icon={Palette} color="amber" />
-              <StatCard label="Layout" value={kpi.layout} icon={Layout} color="emerald" />
-            </div>
-
-            {/* Analysis Tabs */}
-            <motion.div variants={itemVariants} className="min-h-[500px] rounded-3xl border border-gray-200 bg-white shadow-sm">
-              <div className="border-b border-gray-100 p-2">
-                <div className="flex gap-1 overflow-x-auto p-1 sm:gap-2">
-                  {tabs.map((tab) => {
-                    const isActive = activeTab === tab.id;
-                    const Icon = tab.icon;
-                    return (
-                      <button
-                        key={tab.id}
-                        onClick={() => setActiveTab(tab.id)}
-                        className={`relative flex flex-1 items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-medium transition-all ${isActive ? "text-gray-900" : "text-gray-500 hover:bg-gray-50 hover:text-gray-700"
-                          }`}
-                      >
-                        {isActive && (
-                          <motion.div
-                            layoutId="activeTab"
-                            className="absolute inset-0 rounded-xl bg-gray-100"
-                            transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
-                          />
-                        )}
-                        <span className="relative z-10 flex items-center gap-2">
-                          <Icon className={`h-4 w-4 ${isActive ? tab.color : "text-gray-400"}`} />
-                          {tab.label}
-                          <span className={`ml-1 rounded-full px-2 py-0.5 text-xs ${isActive ? "bg-white shadow-sm" : "bg-gray-100"}`}>
-                            {tab.count}
-                          </span>
-                        </span>
-                      </button>
-                    );
-                  })}
+          {/* Image Preview (Full Width) */}
+          <motion.div variants={itemVariants}>
+            <div className="group relative overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm transition-all hover:shadow-md">
+              <div className="absolute inset-x-0 top-0 z-10 flex items-center gap-1.5 border-b border-gray-100 bg-gray-50/90 px-4 py-3 backdrop-blur-sm">
+                <div className="h-3 w-3 rounded-full bg-rose-400/80"></div>
+                <div className="h-3 w-3 rounded-full bg-amber-400/80"></div>
+                <div className="h-3 w-3 rounded-full bg-emerald-400/80"></div>
+                <div className="ml-auto flex items-center gap-2">
+                  <span className="text-xs font-medium text-gray-400">Preview</span>
+                  <Maximize2 className="h-3.5 w-3.5 text-gray-400" />
                 </div>
               </div>
-
-              <div className="p-6">
-                <AnimatePresence mode="wait">
-                  <motion.div
-                    key={activeTab}
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -10 }}
-                    transition={{ duration: 0.2 }}
-                    className="space-y-4"
-                  >
-                    {activeTab === "issues" && (
-                      <>
-                        <div className="mb-4 flex items-center gap-2 text-sm text-rose-600">
-                          <AlertTriangle className="h-4 w-4" />
-                          <span className="font-medium">Critical issues that need attention</span>
-                        </div>
-                        {analysis.issues.length > 0 ? (
-                          analysis.issues.map((item, idx) => (
-                            <AnalysisCard key={idx} item={item} type="issue" />
-                          ))
-                        ) : (
-                          <p className="py-8 text-center text-gray-500">No critical issues found! Great job.</p>
-                        )}
-                      </>
-                    )}
-
-                    {activeTab === "suggestions" && (
-                      <>
-                        <div className="mb-4 flex items-center gap-2 text-sm text-indigo-600">
-                          <Lightbulb className="h-4 w-4" />
-                          <span className="font-medium">Recommended improvements</span>
-                        </div>
-                        {analysis.suggestions.length > 0 ? (
-                          analysis.suggestions.map((item, idx) => (
-                            <AnalysisCard key={idx} item={item} type="suggestion" />
-                          ))
-                        ) : (
-                          <p className="py-8 text-center text-gray-500">No suggestions available.</p>
-                        )}
-                      </>
-                    )}
-
-                    {activeTab === "good" && (
-                      <>
-                        <div className="mb-4 flex items-center gap-2 text-sm text-emerald-600">
-                          <CheckCircle className="h-4 w-4" />
-                          <span className="font-medium">Things you did well</span>
-                        </div>
-                        {analysis.good.length > 0 ? (
-                          analysis.good.map((item, idx) => (
-                            <AnalysisCard key={idx} item={item} type="good" />
-                          ))
-                        ) : (
-                          <p className="py-8 text-center text-gray-500">No passed checks listed.</p>
-                        )}
-                      </>
-                    )}
-                  </motion.div>
-                </AnimatePresence>
+              <div className="relative aspect-video w-full bg-gray-100 pt-10">
+                {imageUrl ? (
+                  <img
+                    src={imageUrl}
+                    alt="Analyzed Design"
+                    className="h-full w-full object-contain transition-transform duration-700 group-hover:scale-[1.02]"
+                  />
+                ) : (
+                  <div className="flex h-full flex-col items-center justify-center gap-3 text-gray-400">
+                    <ImageIcon className="h-10 w-10 opacity-50" />
+                    <span className="text-sm font-medium">No preview available</span>
+                  </div>
+                )}
               </div>
-            </motion.div>
-          </div>
+            </div>
+          </motion.div>
+
+          {/* Analysis Tabs */}
+          <motion.div variants={itemVariants} className="min-h-[500px] rounded-3xl border border-gray-200 bg-white shadow-sm">
+            <div className="border-b border-gray-100 p-2">
+              <div className="flex gap-1 overflow-x-auto p-1 sm:gap-2">
+                {tabs.map((tab) => {
+                  const isActive = activeTab === tab.id;
+                  const Icon = tab.icon;
+                  return (
+                    <button
+                      key={tab.id}
+                      onClick={() => setActiveTab(tab.id)}
+                      className={`relative flex flex-1 items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-medium transition-all ${isActive ? "text-gray-900" : "text-gray-500 hover:bg-gray-50 hover:text-gray-700"
+                        }`}
+                    >
+                      {isActive && (
+                        <motion.div
+                          layoutId="activeTab"
+                          className="absolute inset-0 rounded-xl bg-gray-100"
+                          transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+                        />
+                      )}
+                      <span className="relative z-10 flex items-center gap-2">
+                        <Icon className={`h-4 w-4 ${isActive ? tab.color : "text-gray-400"}`} />
+                        {tab.label}
+                        <span className={`ml-1 rounded-full px-2 py-0.5 text-xs ${isActive ? "bg-white shadow-sm" : "bg-gray-100"}`}>
+                          {tab.count}
+                        </span>
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            <div className="p-6">
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={activeTab}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  transition={{ duration: 0.2 }}
+                  className="space-y-4"
+                >
+                  {activeTab === "issues" && (
+                    <>
+                      <div className="mb-4 flex items-center gap-2 text-sm text-rose-600">
+                        <AlertTriangle className="h-4 w-4" />
+                        <span className="font-medium">Critical issues that need attention</span>
+                      </div>
+                      {analysis.issues.length > 0 ? (
+                        analysis.issues.map((item, idx) => (
+                          <AnalysisCard key={idx} item={item} type="issue" />
+                        ))
+                      ) : (
+                        <p className="py-8 text-center text-gray-500">No critical issues found! Great job.</p>
+                      )}
+                    </>
+                  )}
+
+                  {activeTab === "suggestions" && (
+                    <>
+                      <div className="mb-4 flex items-center gap-2 text-sm text-indigo-600">
+                        <Lightbulb className="h-4 w-4" />
+                        <span className="font-medium">Recommended improvements</span>
+                      </div>
+                      {analysis.suggestions.length > 0 ? (
+                        analysis.suggestions.map((item, idx) => (
+                          <AnalysisCard key={idx} item={item} type="suggestion" />
+                        ))
+                      ) : (
+                        <p className="py-8 text-center text-gray-500">No suggestions available.</p>
+                      )}
+                    </>
+                  )}
+
+                  {activeTab === "good" && (
+                    <>
+                      <div className="mb-4 flex items-center gap-2 text-sm text-emerald-600">
+                        <CheckCircle className="h-4 w-4" />
+                        <span className="font-medium">Things you did well</span>
+                      </div>
+                      {analysis.good.length > 0 ? (
+                        analysis.good.map((item, idx) => (
+                          <AnalysisCard key={idx} item={item} type="good" />
+                        ))
+                      ) : (
+                        <p className="py-8 text-center text-gray-500">No passed checks listed.</p>
+                      )}
+                    </>
+                  )}
+                </motion.div>
+              </AnimatePresence>
+            </div>
+          </motion.div>
         </div>
       </div>
     </motion.div>

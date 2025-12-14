@@ -3,18 +3,38 @@
 import { useMemo, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
-// Mock Data
-const data = [
-    { date: "Mon", score: 68, change: "+2.4%" },
-    { date: "Tue", score: 74, change: "+5.1%" },
-    { date: "Wed", score: 71, change: "-1.2%" },
-    { date: "Thu", score: 82, change: "+8.5%" },
-    { date: "Fri", score: 86, change: "+3.2%" },
-    { date: "Sat", score: 91, change: "+4.0%" },
-    { date: "Sun", score: 94, change: "+1.8%" },
-];
+export default function UiScoreTrend({ data: inputData }) {
+    const data = useMemo(() => {
+        // 1. Create array of last 7 days (YYYY-MM-DD)
+        const last7Days = [];
+        for (let i = 6; i >= 0; i--) {
+            const d = new Date();
+            d.setDate(d.getDate() - i);
+            last7Days.push(d.toISOString().split('T')[0]);
+        }
 
-export default function UiScoreTrend() {
+        // 2. Create lookup for input data
+        const dataMap = {};
+        if (inputData && Array.isArray(inputData)) {
+            inputData.forEach(item => {
+                // Ensure date matches YYYY-MM-DD
+                if (item.date) {
+                    dataMap[item.date] = item.score;
+                }
+            });
+        }
+
+        // 3. Map to final format
+        return last7Days.map(dateStr => {
+            const dateObj = new Date(dateStr);
+            return {
+                date: dateObj.toLocaleDateString('en-US', { weekday: 'short' }),
+                score: dataMap[dateStr] || 0,
+                fullDate: dateStr
+            };
+        });
+    }, [inputData]);
+
     const [hovered, setHovered] = useState(null);
 
     // Dimensions

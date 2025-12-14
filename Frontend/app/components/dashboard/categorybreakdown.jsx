@@ -3,18 +3,33 @@
 import { motion } from "framer-motion";
 import { useState, useMemo } from "react";
 
-// Updated categories based on "Visual Design, Typography, Color & Contrast, Accessibility"
-const data = [
-    { name: "Visual Design", value: 35, color: "#818cf8" },    // Soft Indigo
-    { name: "Typography", value: 25, color: "#f472b6" },       // Soft Pink
-    { name: "Color & Contrast", value: 20, color: "#34d399" }, // Soft Mint
-    { name: "Accessibility", value: 20, color: "#fbbf24" },    // Soft Amber
+// Default/Empty data
+const defaultData = [
+    { name: "Visual Design", value: 0, color: "#818cf8" },
+    { name: "Typography", value: 0, color: "#f472b6" },
+    { name: "Color & Contrast", value: 0, color: "#34d399" },
+    { name: "Accessibility", value: 0, color: "#fbbf24" },
 ];
 
-// Calculate total value for percentage calculation
-const totalValue = data.reduce((acc, cur) => acc + cur.value, 0);
+export default function CategoryBreakdown({ breakdown }) {
+    const data = useMemo(() => {
+        if (!breakdown || Object.keys(breakdown).length === 0) return defaultData;
 
-export default function CategoryBreakdown() {
+        // Map backend keys to our category names
+        // Backend keys: "typography", "spacing", "color", "layout", "visual_hierarchy", "accessibility", "usability"
+        const mapped = [
+            { name: "Visual Design", value: breakdown.visual_hierarchy || 0, color: "#818cf8" },
+            { name: "Typography", value: breakdown.typography || 0, color: "#f472b6" },
+            { name: "Color & Contrast", value: breakdown.color || 0, color: "#34d399" },
+            { name: "Accessibility", value: breakdown.accessibility || 0, color: "#fbbf24" },
+            { name: "Layout", value: breakdown.layout || 0, color: "#60a5fa" }
+        ].filter(d => d.value > 0);
+
+        return mapped.length > 0 ? mapped : defaultData;
+    }, [breakdown]);
+
+    const totalValue = useMemo(() => data.reduce((acc, cur) => acc + cur.value, 0) || 1, [data]);
+
     const [hoveredIndex, setHoveredIndex] = useState(null);
 
     // Chart Dimensions
@@ -44,21 +59,13 @@ export default function CategoryBreakdown() {
                 rotation,
             };
         });
-    }, [circumference]); // Added dependency
+    }, [data, totalValue, circumference]);
 
     return (
-        <div className="w-full h-full bg-white rounded-2xl p-2 shadow-[0_2px_20px_rgba(0,0,0,0.02)] border border-slate-100 flex flex-col relative overflow-hidden">
-
-            {/* Header */}
-            <div className="flex items-center justify-between mb-6">
-                <div>
-                    <h3 className="text-lg font-bold text-slate-900 font-outfit">Category Breakdown</h3>
-                    <p className="text-sm text-slate-500 font-medium mt-1">Issues distribution by type</p>
-                </div>
-            </div>
+        <div className="w-full h-full bg-white rounded-2xl p-6 shadow-[0_2px_20px_rgba(0,0,0,0.02)] border border-slate-100 flex flex-col relative overflow-hidden">
 
             {/* Content Container - Vertical Stack */}
-            <div className="flex-1 flex flex-col items-center justify-between gap-8">
+            <div className="flex-1 flex flex-col items-center justify-between gap-8 mt-4">
 
                 {/* Donut Chart */}
                 <div className="relative flex items-center justify-center shrink-0">
@@ -105,7 +112,7 @@ export default function CategoryBreakdown() {
                 </div>
 
                 {/* Custom Legend - Below Chart */}
-                <div className="w-full grid grid-cols-1 sm:grid-cols-2  pb-2">
+                <div className="w-full grid grid-cols-1 sm:grid-cols-2 gap-2 pb-2">
                     {segments.map((item, index) => (
                         <motion.div
                             key={index}
@@ -113,8 +120,8 @@ export default function CategoryBreakdown() {
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.6 + index * 0.1 }}
                             className={`flex items-center justify-between p-3 rounded-xl transition-all duration-200 cursor-default border border-transparent ${hoveredIndex === index
-                                    ? 'bg-slate-50 border-slate-100 shadow-sm'
-                                    : 'hover:bg-slate-50/50'
+                                ? 'bg-slate-50 border-slate-100 shadow-sm'
+                                : 'hover:bg-slate-50/50'
                                 }`}
                             onMouseEnter={() => setHoveredIndex(index)}
                             onMouseLeave={() => setHoveredIndex(null)}

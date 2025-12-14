@@ -8,7 +8,7 @@ import CategoryBreakdown from "../components/dashboard/categorybreakdown";
 import { motion } from "framer-motion";
 import { FiDownload, FiPlus } from "react-icons/fi";
 import { useSelector, useDispatch } from "react-redux";
-import { useEffect } from "react";
+
 import { fetchUserProfile } from "../lib/auth";
 import { setUser } from "../redux/authSlice";
 
@@ -32,9 +32,13 @@ const item = {
     }
 };
 
+import { fetchDashboardStats } from "../lib/api";
+import { useState, useEffect } from "react";
+
 export default function DashboardPage() {
     const dispatch = useDispatch();
     const { user, token } = useSelector((state) => state.auth);
+    const [dashboardData, setDashboardData] = useState(null);
 
     useEffect(() => {
         if (token && !user) {
@@ -43,6 +47,12 @@ export default function DashboardPage() {
             }).catch((error) => {
                 console.error("Failed to fetch user profile:", error);
             });
+        }
+
+        if (token) {
+            fetchDashboardStats(token).then(data => {
+                setDashboardData(data);
+            }).catch(err => console.error(err));
         }
     }, [token, user, dispatch]);
 
@@ -75,22 +85,22 @@ export default function DashboardPage() {
 
             {/* Stats Grid */}
             <motion.section variants={item}>
-                <StatsCard />
+                <StatsCard statsData={dashboardData} />
             </motion.section>
 
             {/* Charts Section */}
             <motion.section variants={item} className="grid grid-cols-1 xl:grid-cols-3 gap-6">
                 <div className="xl:col-span-2">
-                    <UiScoreTrend />
+                    <UiScoreTrend data={dashboardData?.ui_score_trend} />
                 </div>
                 <div className="xl:col-span-1">
-                    <CategoryBreakdown />
+                    <CategoryBreakdown breakdown={dashboardData?.category_breakdown} />
                 </div>
             </motion.section>
             {/* Recent Table */}
             <motion.section variants={item}>
                 <div className="bg-white rounded-2xl shadow-[0_2px_20px_rgba(0,0,0,0.02)] border border-slate-100 overflow-hidden">
-                    <RecentAudits />
+                    <RecentAudits audits={dashboardData?.recent_audits} />
                 </div>
             </motion.section>
         </motion.div>

@@ -4,34 +4,34 @@ import { TbReportSearch } from "react-icons/tb";
 import { FaStar } from 'react-icons/fa';
 import { FiArrowUpRight, FiArrowDownRight } from 'react-icons/fi';
 
-const StatsCard = () => {
+const StatsCard = ({ statsData }) => {
   const stats = [
     {
       title: "Total Designs",
-      value: "150",
-      change: "+12.5%",
-      trend: "up",
+      value: statsData?.total_designs || 0,
+      change: "0%", // Placeholder or calculation from prop if available
+      trend: "neutral",
       icon: FaPenNib,
       color: "blue",
-      description: "vs. last month"
+      description: "Lifetime"
     },
     {
       title: "Audit Reports",
-      value: "45",
-      change: "+8.2%",
-      trend: "up",
+      value: statsData?.audit_reports || 0,
+      change: "0%",
+      trend: "neutral",
       icon: TbReportSearch,
       color: "indigo",
-      description: "vs. last month"
+      description: "Lifetime"
     },
     {
       title: "Avg. Score",
-      value: "85%",
-      change: "-2.4%",
-      trend: "down",
+      value: (statsData?.avg_score || 0) + "%",
+      change: "0%",
+      trend: "neutral",
       icon: FaStar,
       color: "amber",
-      description: "vs. last month"
+      description: "Across all audits"
     }
   ];
 
@@ -58,8 +58,8 @@ const StatsCard = () => {
                 <Icon className="text-xl" />
               </div>
               <div className={`flex items-center gap-1 text-xs font-medium px-2 py-1 rounded-full ${stat.trend === 'up'
-                  ? 'bg-green-50 text-green-600'
-                  : 'bg-red-50 text-red-600'
+                ? 'bg-green-50 text-green-600'
+                : 'bg-red-50 text-red-600'
                 }`}>
                 {stat.trend === 'up' ? <FiArrowUpRight /> : <FiArrowDownRight />}
                 {stat.change}

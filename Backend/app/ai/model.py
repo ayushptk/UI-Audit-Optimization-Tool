@@ -89,7 +89,17 @@ def analyze_with_ai(description: str) -> dict:
     # As a last resort, try to coerce simple key/value lines into a dict (very small fallback)
     # But prefer returning something predictable for storage
     return {
-        "kpi": {"overall_score": 0},
+        "kpi": {
+            "overall": 0,
+            "typography": 0,
+            "spacing": 0,
+            "color": 0,
+            "layout": 0,
+            "visual_hierarchy": 0,
+            "accessibility": 0,
+            "usability": 0
+        },
+        "kpi_details": {},
         "good": [],
         "issues": ["AI response could not be parsed as JSON"],
         "suggestions": [raw[:1000]]

@@ -54,8 +54,13 @@ export default function RecentAudits({ audits = [] }) {
                                 </td>
                                
                                 <td className="px-6 py-4 text-right flex gap-1 justify-end">
-                                    <button className="p-2 text-slate-400 hover:text-slate-600 rounded-lg hover:bg-white hover:shadow-sm transition-all">
+                                   
+                                   
+                                    <button className="p-2 text-slate-400 hover:text-slate-600 rounded-lg hover:bg-white hover:shadow-sm transition-all" title="View">
                                         <FiEye className="w-4 h-4" />
+                                    </button>
+                                     <button className="p-2 text-slate-400 hover:text-slate-600 rounded-lg hover:bg-white hover:shadow-sm transition-all" title="Delete">
+                                        <FiTrash className="w-4 h-4" />
                                     </button>
                                 </td>
                             </tr>

@@ -68,7 +68,7 @@ export default function UiScoreTrend({ data: inputData }) {
             path += ` C ${cp1x} ${cp1y}, ${cp2x} ${cp2y}, ${x1} ${y1}`;
         }
         return path;
-    }, []);
+    }, [data]);
 
     // Gradient area fill (optional, but requested "line chart" usually implies just line or area. User said "single smooth curved line". I'll stick to line for clarity, or add a very subtle fade below.)
     // User asked for "single smooth curved line with a soft gradient stroke".

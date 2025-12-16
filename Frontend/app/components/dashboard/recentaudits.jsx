@@ -2,8 +2,30 @@
 
 import React from 'react';
 import { FiExternalLink, FiMoreVertical, FiArrowRight, FiEye, FiEdit, FiTrash } from 'react-icons/fi';
+import { useRouter } from 'next/navigation';
+import { useSelector } from 'react-redux';
+import { deleteAudit } from '../../lib/api';
 
 export default function RecentAudits({ audits = [] }) {
+    const router = useRouter();
+    const { token } = useSelector((state) => state.auth);
+
+    const handleView = (id) => {
+        router.push(`/dashboard/reports/${id}`);
+    };
+
+    const handleDelete = async (id) => {
+        if (!confirm("Are you sure you want to delete this audit report?")) return;
+
+        try {
+            await deleteAudit(id, token);
+            // Reload to refresh stats and list
+            window.location.reload();
+        } catch (error) {
+            console.error("Error deleting audit:", error);
+            alert("Error deleting audit");
+        }
+    };
 
     return (
         <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
@@ -23,7 +45,7 @@ export default function RecentAudits({ audits = [] }) {
                             <th className="px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">Project</th>
                             <th className="px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">Score</th>
                             <th className="px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">Date</th>
-                           
+
                             <th className="px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider text-right">Actions</th>
                         </tr>
                     </thead>
@@ -42,9 +64,9 @@ export default function RecentAudits({ audits = [] }) {
                                 </td>
                                 <td className="px-6 py-4">
                                     <span className={`inline-flex items-center justify-center px-2.5 py-1 rounded-full text-xs font-bold ring-1 ring-inset ${audit.overall_score >= 90 ? 'text-emerald-600 bg-emerald-50 ring-emerald-100' :
-                                            audit.overall_score >= 70 ? 'text-indigo-600 bg-indigo-50 ring-indigo-100' :
-                                                audit.overall_score >= 50 ? 'text-amber-600 bg-amber-50 ring-amber-100' :
-                                                    'text-rose-600 bg-rose-50 ring-rose-100'
+                                        audit.overall_score >= 70 ? 'text-indigo-600 bg-indigo-50 ring-indigo-100' :
+                                            audit.overall_score >= 50 ? 'text-amber-600 bg-amber-50 ring-amber-100' :
+                                                'text-rose-600 bg-rose-50 ring-rose-100'
                                         }`}>
                                         {audit.overall_score}
                                     </span>
@@ -52,14 +74,22 @@ export default function RecentAudits({ audits = [] }) {
                                 <td className="px-6 py-4 text-sm text-slate-500">
                                     {new Date(audit.date).toLocaleDateString()}
                                 </td>
-                               
+
                                 <td className="px-6 py-4 text-right flex gap-1 justify-end">
-                                   
-                                   
-                                    <button className="p-2 text-slate-400 hover:text-slate-600 rounded-lg hover:bg-white hover:shadow-sm transition-all" title="View">
+
+
+                                    <button
+                                        onClick={() => handleView(audit.id)}
+                                        className="p-2 text-slate-400 hover:text-slate-600 rounded-lg hover:bg-white hover:shadow-sm transition-all"
+                                        title="View"
+                                    >
                                         <FiEye className="w-4 h-4" />
                                     </button>
-                                     <button className="p-2 text-slate-400 hover:text-slate-600 rounded-lg hover:bg-white hover:shadow-sm transition-all" title="Delete">
+                                    <button
+                                        onClick={() => handleDelete(audit.id)}
+                                        className="p-2 text-slate-400 hover:text-rose-600 rounded-lg hover:bg-white hover:shadow-sm transition-all"
+                                        title="Delete"
+                                    >
                                         <FiTrash className="w-4 h-4" />
                                     </button>
                                 </td>

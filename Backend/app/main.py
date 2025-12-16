@@ -7,6 +7,7 @@ from app.api.endpoints import upload
 from app.api.endpoints.analyze import router as analyze_router
 from app.api.endpoints import analyzeai
 from app.api.endpoints import dashboard
+from app.api.endpoints import audit
 app = FastAPI(title="UIaudit Backend API")
 Base.metadata.create_all(bind=engine)
 
@@ -25,6 +26,7 @@ app.include_router(upload.router, prefix="/api")
 app.include_router(analyze_router, prefix="/api")
 app.include_router(analyzeai.router, prefix="/api")
 app.include_router(dashboard.router, prefix="/api")
+app.include_router(audit.router, prefix="/api")
 
 
 @app.get("/")

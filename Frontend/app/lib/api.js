@@ -13,3 +13,17 @@ export async function fetchDashboardStats(token) {
 
     return res.json();
 }
+
+export async function deleteAudit(id, token) {
+    const res = await fetch(`${BASE_URL}/api/audit/${id}`, {
+        method: "DELETE",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`
+        },
+    });
+
+    if (!res.ok) throw new Error("Failed to delete audit");
+    return true;
+}
+

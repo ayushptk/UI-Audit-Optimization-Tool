@@ -33,12 +33,17 @@ const item = {
 };
 
 import { fetchDashboardStats } from "../lib/api";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
+import { useRouter } from 'next/navigation';
+import jsPDF from 'jspdf';
+import { toPng } from 'html-to-image';
 
 export default function DashboardPage() {
     const dispatch = useDispatch();
     const { user, token } = useSelector((state) => state.auth);
     const [dashboardData, setDashboardData] = useState(null);
+    const router = useRouter();
+    const dashboardRef = useRef(null);
 
     useEffect(() => {
         if (token && !user) {
@@ -58,8 +63,35 @@ export default function DashboardPage() {
 
     const displayName = user ? (user.username || user.name).charAt(0).toUpperCase() + (user.username || user.name).slice(1) : 'User';
 
+    const handleNewAudit = () => {
+        router.push('/dashboard/upload');
+    };
+
+    const handleExport = async () => {
+        if (!dashboardRef.current) return;
+
+        try {
+            const dataUrl = await toPng(dashboardRef.current, {
+                cacheBust: false,
+                pixelRatio: 2,
+                fontEmbedCSS: '' // Skip font embedding to avoid parsing errors
+            });
+            const pdf = new jsPDF({
+                orientation: 'portrait',
+                unit: 'px',
+                format: [dashboardRef.current.scrollWidth, dashboardRef.current.scrollHeight]
+            });
+
+            pdf.addImage(dataUrl, 'PNG', 0, 0, dashboardRef.current.scrollWidth, dashboardRef.current.scrollHeight);
+            pdf.save('dashboard-report.pdf');
+        } catch (error) {
+            console.error("Export failed", error);
+        }
+    };
+
     return (
         <motion.div
+            ref={dashboardRef}
             variants={container}
             initial="hidden"
             animate="show"
@@ -72,11 +104,17 @@ export default function DashboardPage() {
                     <p className="text-slate-500 text-base font-medium">Welcome back, {displayName}. Here's your audit performance.</p>
                 </div>
                 <div className="flex gap-3">
-                    <button className="flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 text-slate-600 rounded-lg text-sm font-semibold hover:bg-slate-50 hover:border-slate-300 transition-all shadow-sm active:translate-y-0.5">
+                    <button
+                        onClick={handleExport}
+                        className="flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 text-slate-600 rounded-lg text-sm font-semibold hover:bg-slate-50 hover:border-slate-300 transition-all shadow-sm active:translate-y-0.5"
+                    >
                         <FiDownload className="w-4 h-4" />
                         Export
                     </button>
-                    <button className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm font-semibold hover:bg-indigo-700 transition-all shadow-lg shadow-slate-200 hover:shadow-xl active:translate-y-0.5">
+                    <button
+                        onClick={handleNewAudit}
+                        className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm font-semibold hover:bg-indigo-700 transition-all shadow-lg shadow-slate-200 hover:shadow-xl active:translate-y-0.5"
+                    >
                         <FiPlus className="w-4 h-4" />
                         New Audit
                     </button>

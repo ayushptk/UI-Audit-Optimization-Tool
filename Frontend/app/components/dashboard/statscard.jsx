@@ -9,8 +9,8 @@ const StatsCard = ({ statsData }) => {
     {
       title: "Total Designs",
       value: statsData?.total_designs || 0,
-      change: "0%", // Placeholder or calculation from prop if available
-      trend: "neutral",
+      change: statsData?.total_designs_change || "0%",
+      trend: statsData?.total_designs_trend || "neutral",
       icon: FaPenNib,
       color: "blue",
       description: "Lifetime"
@@ -18,8 +18,8 @@ const StatsCard = ({ statsData }) => {
     {
       title: "Audit Reports",
       value: statsData?.audit_reports || 0,
-      change: "0%",
-      trend: "neutral",
+      change: statsData?.audit_reports_change || "0%",
+      trend: statsData?.audit_reports_trend || "neutral",
       icon: TbReportSearch,
       color: "indigo",
       description: "Lifetime"
@@ -27,8 +27,8 @@ const StatsCard = ({ statsData }) => {
     {
       title: "Avg. Score",
       value: (statsData?.avg_score || 0) + "%",
-      change: "0%",
-      trend: "neutral",
+      change: statsData?.avg_score_change || "0%",
+      trend: statsData?.avg_score_trend || "neutral",
       icon: FaStar,
       color: "amber",
       description: "Across all audits"

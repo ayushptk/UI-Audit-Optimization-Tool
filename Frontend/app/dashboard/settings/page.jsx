@@ -27,7 +27,7 @@ export default function SettingsPage() {
             </header>
 
             <div className="flex flex-col lg:flex-row gap-8">
-               
+
                 {/* Main Content Area */}
                 <div className="flex-1 min-w-0">
                     <AnimatePresence mode="wait">
@@ -68,25 +68,25 @@ function SubscriptionContent() {
                     <div>
                         <div className="flex items-center gap-3 mb-2">
                             <span className="bg-blue-100 text-blue-700 dark:bg-blue-500/20 dark:text-blue-300 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">Current Plan</span>
-                            <span className="text-sm text-gray-500">Renews on Oct 24, 2025</span>
+                            <span className="text-amber-600 font-medium text-sm">Expires in 7 days</span>
                         </div>
-                        <h2 className="text-4xl font-extrabold text-gray-900 dark:text-white mb-2">Pro Plan</h2>
-                        <p className="text-gray-500 max-w-md">Everything you need to grow your business. Ultra-fast performance and priority support.</p>
+                        <h2 className="text-4xl font-extrabold text-gray-900 dark:text-white mb-2">Free Trial</h2>
+                        <p className="text-gray-500 max-w-md">Experience the full power of Pro features before your trial ends.</p>
                     </div>
 
                     <div className="flex flex-col items-end gap-2">
                         <div className="text-right">
-                            <span className="text-3xl font-bold text-gray-900 dark:text-white">$29</span>
-                            <span className="text-gray-500">/month</span>
+                            <span className="text-3xl font-bold text-gray-900 dark:text-white">$0</span>
+                            <span className="text-gray-500">/ trial</span>
                         </div>
-                        <button className="text-blue-600 hover:text-blue-700 font-medium text-sm">Switch to Annual (Save 20%)</button>
+                        <button className="text-blue-600 hover:text-blue-700 font-medium text-sm">Upgrade to Pro Plan</button>
                     </div>
                 </div>
 
                 <div className="mt-8 pt-8 border-t border-gray-100 dark:border-gray-800">
                     <div className="flex justify-between text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                         <span>Monthly Usage</span>
-                        <span>8,500 / 10,000 API Calls</span>
+                        <span>0/10API Calls</span>
                     </div>
                     <div className="w-full bg-gray-100 dark:bg-gray-800 rounded-full h-3 overflow-hidden">
                         <div className="bg-gradient-to-r from-blue-500 to-indigo-600 h-3 rounded-full w-[85%]" />
@@ -103,48 +103,86 @@ function SubscriptionContent() {
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    {['Starter', 'Pro', 'Enterprise'].map((plan, idx) => (
+                    {[
+                        {
+                            name: 'Free',
+                            price: '$0',
+                            period: '/forever',
+                            description: 'Perfect for getting started',
+                            features: [
+                                '5 design audits per month',
+                                'Basic usability analysis',
+                                'Accessibility checklist',
+                                'PDF reports',
+                            ]
+                        },
+                        {
+                            name: 'Pro',
+                            price: '$29',
+                            period: '/month',
+                            description: 'For growing teams',
+                            popular: true,
+                            features: [
+                                'Unlimited design audits',
+                                'Advanced AI analysis',
+                                'Full accessibility audit',
+                                'Priority support',
+                                'Team collaboration',
+                                'Custom integrations',
+                            ]
+                        },
+                        {
+                            name: 'Enterprise',
+                            price: 'Custom',
+                            period: '',
+                            description: 'For large organizations',
+                            features: [
+                                'Everything in Pro',
+                                'Dedicated account manager',
+                                'On-premise deployment',
+                                'Advanced security',
+                                'Custom AI training',
+                                '24/7 phone support',
+                            ]
+                        }
+                    ].map((plan) => (
                         <div
-                            key={plan}
-                            className={`relative p-6 rounded-2xl border transition-all duration-300 ${plan === 'Pro'
-                                    ? 'border-blue-500 ring-4 ring-blue-500/10 bg-white dark:bg-gray-900 shadow-xl'
-                                    : 'border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 hover:border-blue-200'
+                            key={plan.name}
+                            className={`relative p-6 rounded-2xl border transition-all duration-300 ${plan.popular
+                                ? 'border-blue-500 ring-4 ring-blue-500/10 bg-white dark:bg-gray-900 shadow-xl'
+                                : 'border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 hover:border-blue-200'
                                 }`}
                         >
-                            {plan === 'Pro' && (
+                            {plan.popular && (
                                 <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-blue-600 text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg">
                                     MOST POPULAR
                                 </div>
                             )}
                             <div className="mb-4">
-                                <h4 className="text-lg font-bold text-gray-900 dark:text-white">{plan}</h4>
+                                <h4 className="text-lg font-bold text-gray-900 dark:text-white">{plan.name}</h4>
                                 <p className="text-sm text-gray-500 mt-1">
-                                    {plan === 'Starter' && 'For individuals'}
-                                    {plan === 'Pro' && 'For growing teams'}
-                                    {plan === 'Enterprise' && 'For large organizations'}
+                                    {plan.description}
                                 </p>
                             </div>
                             <div className="mb-6">
                                 <span className="text-3xl font-bold text-gray-900 dark:text-white">
-                                    {plan === 'Starter' && '$0'}
-                                    {plan === 'Pro' && '$29'}
-                                    {plan === 'Enterprise' && '$99'}
+                                    {plan.price}
                                 </span>
-                                <span className="text-gray-500 text-sm">/mo</span>
+                                {plan.period && <span className="text-gray-500 text-sm">{plan.period}</span>}
                             </div>
 
-                            <button className={`w-full py-2.5 rounded-xl font-medium text-sm transition-colors ${plan === 'Pro'
-                                    ? 'bg-blue-600 text-white hover:bg-blue-700 shadow-lg shadow-blue-500/30'
-                                    : 'bg-gray-100 text-gray-900 hover:bg-gray-200 dark:bg-gray-800 dark:text-white dark:hover:bg-gray-700'
+                            <button className={`w-full py-2.5 rounded-xl font-medium text-sm transition-colors ${plan.popular
+                                ? 'bg-blue-600 text-white hover:bg-blue-700 shadow-lg shadow-blue-500/30'
+                                : 'bg-gray-100 text-gray-900 hover:bg-gray-200 dark:bg-gray-800 dark:text-white dark:hover:bg-gray-700'
                                 }`}>
-                                {plan === 'Pro' ? 'Current Plan' : plan === 'Starter' ? 'Downgrade' : 'Upgrade'}
+                                {plan.name === 'Pro' ? 'Current Plan' : plan.name === 'Enterprise' ? 'Contact Sales' : 'Downgrade'}
                             </button>
 
                             <ul className="mt-6 space-y-3">
-                                {[1, 2, 3].map(i => (
-                                    <li key={i} className="flex items-center gap-3 text-sm text-gray-600 dark:text-gray-400">
-                                        <Check className={`w-4 h-4 ${plan === 'Pro' ? 'text-blue-500' : 'text-gray-400'}`} />
-                                        Feature description here
+                                {plan.features.map((feature, i) => (
+                                    <li key={i} className="flex items-start gap-3 text-sm text-gray-600 dark:text-gray-400">
+                                        <Check className={`w-4 h-4 mt-0.5 shrink-0 ${plan.popular ? 'text-blue-500' : 'text-gray-400'}`} />
+                                        <span>{feature}</span>
                                     </li>
                                 ))}
                             </ul>

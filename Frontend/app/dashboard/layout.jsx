@@ -166,8 +166,8 @@ export default function DashboardLayout({ children }) {
                   <FiUsers className="w-4 h-4" />
                 </div>
                 <div>
-                  <p className="text-sm font-semibold text-slate-900">Pro Plan</p>
-                  <p className="text-xs text-slate-500">Active until Dec 2025</p>
+                  <p className="text-sm font-semibold text-slate-900">Free Trail</p>
+                  <p className="text-xs text-slate-500">Active until 7 days</p>
                 </div>
               </div>
             </div>

@@ -14,6 +14,7 @@ import { BsMicrosoftTeams } from "react-icons/bs";
 import { useSelector, useDispatch } from 'react-redux';
 import { fetchUserProfile } from '../lib/auth';
 import { setUser, setCredentials } from '../redux/authSlice';
+import NotificationDropdown from '../components/dashboard/notificationdropdown';
 
 const outfit = Outfit({
   subsets: ['latin'],
@@ -30,6 +31,7 @@ const inter = Inter({
 export default function DashboardLayout({ children }) {
   const pathname = usePathname();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [showNotifications, setShowNotifications] = useState(false);
   const [scrolled, setScrolled] = useState(false);
 
   const dispatch = useDispatch();
@@ -225,10 +227,19 @@ export default function DashboardLayout({ children }) {
 
             <div className="flex items-center gap-3">
               {/* Notifications */}
-              <button className="relative p-2.5 text-slate-500 hover:bg-white hover:text-indigo-600 hover:shadow-md rounded-full transition-all duration-200">
-                <FiBell className="w-5 h-5" />
-                <span className="absolute top-2.5 right-3 w-2 h-2 bg-rose-500 rounded-full ring-2 ring-white"></span>
-              </button>
+              <div className="relative">
+                <button
+                  onClick={() => setShowNotifications(!showNotifications)}
+                  className="relative p-2.5 text-slate-500 hover:bg-white hover:text-indigo-600 hover:shadow-md rounded-full transition-all duration-200"
+                >
+                  <FiBell className="w-5 h-5" />
+                  <span className="absolute top-2.5 right-3 w-2 h-2 bg-rose-500 rounded-full ring-2 ring-white"></span>
+                </button>
+                <NotificationDropdown
+                  isOpen={showNotifications}
+                  onClose={() => setShowNotifications(false)}
+                />
+              </div>
 
               {/* Profile */}
               <div className="flex items-center gap-3 pl-3 lg:pl-6 lg:border-l border-slate-200">

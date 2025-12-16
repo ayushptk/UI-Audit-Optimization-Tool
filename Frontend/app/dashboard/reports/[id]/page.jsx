@@ -1,8 +1,10 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { getAnalyses } from "../../../lib/analyze";
+import { toPng } from "html-to-image";
+import jsPDF from "jspdf";
 import {
   CheckCircle,
   AlertTriangle,
@@ -161,6 +163,8 @@ export default function ReportPage() {
   const [error, setError] = useState(null);
   const [imageUrl, setImageUrl] = useState(null);
   const [activeTab, setActiveTab] = useState("issues");
+  const [isExporting, setIsExporting] = useState(false);
+  const reportRef = useRef(null);
 
   useEffect(() => {
     let mounted = true;
@@ -231,6 +235,52 @@ export default function ReportPage() {
     };
   }, [id]);
 
+  const handleExport = async () => {
+    if (!reportRef.current) return;
+
+    setIsExporting(true);
+    try {
+      const dataUrl = await toPng(reportRef.current, {
+        quality: 0.95,
+        backgroundColor: '#ffffff',
+        pixelRatio: 2,
+        width: reportRef.current.scrollWidth,
+        height: reportRef.current.scrollHeight,
+        fontEmbedCSS: '' // Prevent font parsing errors
+      });
+
+      const pdf = new jsPDF({
+        orientation: 'portrait',
+        unit: 'mm',
+        format: 'a4'
+      });
+
+      const imgProperties = pdf.getImageProperties(dataUrl);
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = (imgProperties.height * pdfWidth) / imgProperties.width;
+      const pageHeight = pdf.internal.pageSize.getHeight();
+
+      let heightLeft = pdfHeight;
+      let position = 0;
+
+      pdf.addImage(dataUrl, 'PNG', 0, position, pdfWidth, pdfHeight);
+      heightLeft -= pageHeight;
+
+      while (heightLeft >= 0) {
+        position = heightLeft - pdfHeight;
+        pdf.addPage();
+        pdf.addImage(dataUrl, 'PNG', 0, position, pdfWidth, pdfHeight);
+        heightLeft -= pageHeight;
+      }
+
+      pdf.save(`report-${id}.pdf`);
+    } catch (error) {
+      console.error("Export failed:", error);
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
   const kpi = analysis.kpi || {};
 
   const tabs = [
@@ -291,15 +341,23 @@ export default function ReportPage() {
               <Share2 className="h-4 w-4" />
               <span className="hidden sm:inline">Share</span>
             </button>
-            <button className="inline-flex items-center gap-2 rounded-lg bg-indigo-600 px-3 py-2 text-sm font-medium text-white shadow-sm transition-all hover:bg-gray-800 hover:shadow-md">
-              <Download className="h-4 w-4" />
-              <span className="hidden sm:inline">Export Report</span>
+            <button
+              onClick={handleExport}
+              disabled={isExporting}
+              className="inline-flex items-center gap-2 rounded-lg bg-indigo-600 px-3 py-2 text-sm font-medium text-white shadow-sm transition-all hover:bg-gray-800 hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {isExporting ? (
+                <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+              ) : (
+                <Download className="h-4 w-4" />
+              )}
+              <span className="hidden sm:inline">{isExporting ? 'Exporting...' : 'Export Report'}</span>
             </button>
           </div>
         </div>
       </div>
 
-      <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+      <div ref={reportRef} className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8 bg-gray-50/50">
         {/* Header Section */}
         <motion.div variants={itemVariants} className="mb-10">
           <div className="flex flex-col gap-1">

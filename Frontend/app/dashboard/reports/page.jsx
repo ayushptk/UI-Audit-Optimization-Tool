@@ -1,9 +1,11 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { FiFileText, FiTrendingUp, FiAlertCircle, FiCheckCircle, FiClock, FiArrowRight, FiFilter, FiDownload } from "react-icons/fi";
+import jsPDF from 'jspdf';
+import { toPng } from 'html-to-image';
 
 function Badge({ tone = "neutral", children }) {
   const styles = {
@@ -64,7 +66,7 @@ function ScorePill({ score }) {
     <div className="flex items-center gap-3">
       <div className="flex-1 h-2 w-24 bg-slate-100 rounded-full overflow-hidden">
         <div
-          className={`h-full rounded-full ${s >= 85 ? 'bg-emerald-500' : s >= 70 ? 'bg-amber-500' : 'bg-rose-500'}`}
+          className={`h-full rounded-full ${s >= 85 ? 'bg-emerald-500' : s >= 51 ? 'bg-amber-500' : 'bg-rose-500'}`}
           style={{ width: `${s}%` }}
         />
       </div>
@@ -79,6 +81,7 @@ export default function ReportsOverviewPage() {
   const [reports, setReports] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const reportsRef = useRef(null);
 
   useEffect(() => {
     async function fetchReports() {
@@ -94,14 +97,20 @@ export default function ReportsOverviewPage() {
 
         const normalized = (Array.isArray(data) ? data : []).map((d) => {
           const analysisRaw = d.analysis_result;
-          let analysis = analysisRaw;
+          let analysis = null;
 
-          if (typeof analysisRaw === "string") {
+          // Robust parsing logic similar to details page
+          if (typeof analysisRaw === "object" && analysisRaw !== null) {
+            analysis = analysisRaw;
+          } else if (typeof analysisRaw === "string") {
             try {
-              // simple parse attempt
-              analysis = JSON.parse(analysisRaw);
+              // Try removing markdown fences if present
+              const fenceRegex = /```(?:json)?\s*([\s\S]*?)\s*```/i;
+              const match = analysisRaw.match(fenceRegex);
+              const jsonStr = match ? match[1] : analysisRaw;
+              analysis = JSON.parse(jsonStr);
             } catch (e) {
-              // fallback logic if needed
+              console.error("Failed to parse analysis JSON", e);
               analysis = null;
             }
           }
@@ -111,13 +120,31 @@ export default function ReportsOverviewPage() {
           const suggestionsCount = Array.isArray(analysis?.suggestions) ? analysis.suggestions.length : typeof analysis?.suggestions === "number" ? analysis.suggestions : 0;
 
           let scoreValue = null;
-          if (analysis && typeof analysis.score === "number") {
-            scoreValue = analysis.score;
-          } else if (analysis && typeof analysis.score === "string" && !isNaN(Number(analysis.score))) {
-            scoreValue = Number(analysis.score);
-          } else {
-            const totalFindings = goodCount + issuesCount + suggestionsCount;
-            scoreValue = totalFindings > 0 ? Math.round((goodCount / totalFindings) * 100) : null;
+
+          // prioritize KPI average calculation to match details page
+          if (analysis?.kpi) {
+            const kpi = analysis.kpi;
+            const typography = Number(kpi.typography || 0);
+            const spacing = Number(kpi.spacing || 0);
+            const color = Number(kpi.color || 0);
+            const layout = Number(kpi.layout || 0);
+
+            // Only use average if we have some KPI data
+            if (typography || spacing || color || layout) {
+              scoreValue = Math.round((typography + spacing + color + layout) / 4);
+            }
+          }
+
+          // Fallback to existing logic if KPI-based score is not available
+          if (scoreValue === null) {
+            if (analysis && typeof analysis.score === "number") {
+              scoreValue = analysis.score;
+            } else if (analysis && typeof analysis.score === "string" && !isNaN(Number(analysis.score))) {
+              scoreValue = Number(analysis.score);
+            } else {
+              const totalFindings = goodCount + issuesCount + suggestionsCount;
+              scoreValue = totalFindings > 0 ? Math.round((goodCount / totalFindings) * 100) : null;
+            }
           }
 
           return {
@@ -142,6 +169,28 @@ export default function ReportsOverviewPage() {
     fetchReports();
   }, []);
 
+  const handleExport = async () => {
+    if (!reportsRef.current) return;
+
+    try {
+      const dataUrl = await toPng(reportsRef.current, {
+        cacheBust: false,
+        pixelRatio: 2,
+        fontEmbedCSS: '' // Skip font embedding to avoid parsing errors
+      });
+      const pdf = new jsPDF({
+        orientation: 'portrait',
+        unit: 'px',
+        format: [reportsRef.current.scrollWidth, reportsRef.current.scrollHeight]
+      });
+
+      pdf.addImage(dataUrl, 'PNG', 0, 0, reportsRef.current.scrollWidth, reportsRef.current.scrollHeight);
+      pdf.save('reports-summary.pdf');
+    } catch (error) {
+      console.error("Export failed", error);
+    }
+  };
+
   const count = reports.length;
   const avgScore = count ? Math.round(reports.reduce((a, r) => a + (Number(r.score) || 0), 0) / count) : 0;
   const totalGood = reports.reduce((a, r) => a + (r.totals?.good || 0), 0);
@@ -149,9 +198,10 @@ export default function ReportsOverviewPage() {
 
   return (
     <motion.div
+      ref={reportsRef}
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      className="min-h-screen space-y-8"
+      className="min-h-screen space-y-8 bg-white p-6"
     >
       {/* Header */}
       <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between pb-6 border-b border-slate-200/60">
@@ -160,7 +210,10 @@ export default function ReportsOverviewPage() {
           <p className="mt-2 text-slate-500">Track and analyze your design quality over time.</p>
         </div>
         <div className="flex gap-3">
-          <button className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50 hover:border-slate-300 transition-all shadow-sm">
+          <button
+            onClick={handleExport}
+            className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5  cursor-pointer text-sm font-semibold text-slate-700 hover:bg-slate-50 hover:border-slate-300 transition-all shadow-sm"
+          >
             <FiDownload className="w-4 h-4" />
             Export Summary
           </button>

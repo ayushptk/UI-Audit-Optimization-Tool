@@ -13,10 +13,18 @@ export default function Home() {
     <div>
       <IntroLayout>
       <Navbar />
-      <Herosection />
-      <Feature />
-      <Pricing />
-      <Faq />
+      <section id="home">
+        <Herosection />
+      </section>
+      <section id="features">
+        <Feature />
+      </section>
+      <section id="pricing">
+        <Pricing />
+      </section>
+      <section id="faq">
+        <Faq />
+      </section>
       <Footer />
       </IntroLayout>
     </div>

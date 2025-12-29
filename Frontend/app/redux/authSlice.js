@@ -38,20 +38,20 @@ const authSlice = createSlice({
       state.supabaseUser = action.payload;
       state.isAuthenticated = true;
     },
-    initializeSupabaseAuth: (state) => {
-      // Initialize Supabase auth listener
-      supabase.auth.onAuthStateChange((event, session) => {
-        if (session) {
-          state.supabaseUser = session.user;
-          state.isAuthenticated = true;
-        } else {
-          state.supabaseUser = null;
-          state.isAuthenticated = false;
-        }
-      });
+    setSupabaseSession: (state, action) => {
+      const session = action.payload;
+      if (session) {
+        state.supabaseUser = session.user;
+        state.isAuthenticated = true;
+        state.user = session.user;
+      } else {
+        state.supabaseUser = null;
+        state.isAuthenticated = false;
+        state.user = null;
+      }
     },
   },
 });
 
-export const { setCredentials, logout, setUser, setSupabaseUser, initializeSupabaseAuth } = authSlice.actions;
+export const { setCredentials, logout, setUser, setSupabaseUser, setSupabaseSession } = authSlice.actions;
 export default authSlice.reducer;

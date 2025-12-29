@@ -13,7 +13,8 @@ import { TbReportSearch } from "react-icons/tb";
 import { BsMicrosoftTeams } from "react-icons/bs";
 import { useSelector, useDispatch } from 'react-redux';
 import { fetchUserProfile } from '../lib/auth';
-import { setUser, setCredentials } from '../redux/authSlice';
+import { setUser, setCredentials, logout } from '../redux/authSlice';
+import { useRouter } from 'next/navigation';
 import NotificationDropdown from '../components/dashboard/notificationdropdown';
 
 const outfit = Outfit({
@@ -171,13 +172,16 @@ export default function DashboardLayout({ children }) {
                 </div>
               </div>
             </div>
-            <Link
-              href="/logout"
+            <button
+              onClick={() => {
+                dispatch(logout());
+                router.push('/login');
+              }}
               className="flex items-center gap-3 px-4 py-3.5 rounded-xl text-slate-500 hover:bg-rose-50 hover:text-rose-600 transition-all duration-200 font-medium text-sm group"
             >
               <FiLogOut className="w-5 h-5 transition-transform group-hover:-translate-x-1" />
               <span>Sign Out</span>
-            </Link>
+            </button>
           </div>
         </div>
       </aside>

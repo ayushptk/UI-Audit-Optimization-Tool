@@ -24,7 +24,7 @@ export default function UiScoreTrend({ data: inputData }) {
             });
         }
 
-        // 3. Map to final format
+      
         return last7Days.map(dateStr => {
             const dateObj = new Date(dateStr);
             return {

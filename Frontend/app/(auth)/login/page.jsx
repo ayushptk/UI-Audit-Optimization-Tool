@@ -4,9 +4,10 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { FiEye, FiEyeOff, FiMail, FiLock, FiArrowRight, FiUser } from 'react-icons/fi';
 import { useDispatch } from 'react-redux';
-import { setCredentials } from "../../redux/authSlice";
-import { login } from '../../lib/auth';
+import { setCredentials, initializeSupabaseAuth } from "../../redux/authSlice";
+import { login, signInWithGoogle, signInWithFacebook, signInWithApple } from '../../lib/auth';
 import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
 export default function Login() {
     const dispatch = useDispatch();

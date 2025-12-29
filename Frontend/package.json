@@ -11,6 +11,7 @@
   "dependencies": {
     "@reduxjs/toolkit": "^2.11.1",
     "@studio-freight/lenis": "^1.0.42",
+    "@supabase/supabase-js": "^2.39.3",
     "chart.js": "^4.5.1",
     "face-api.js": "^0.22.2",
     "framer-motion": "^12.23.24",

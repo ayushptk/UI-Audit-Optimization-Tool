@@ -1,3 +1,5 @@
+import { supabase } from './supabase';
+
 const BASE_URL = "http://127.0.0.1:8000";
 
 export async function login(email, password) {
@@ -38,4 +40,48 @@ export async function fetchUserProfile(token) {
   if (!res.ok) throw new Error("Failed to fetch user profile");
 
   return res.json();
+}
+
+// Supabase OAuth functions
+export async function signInWithGoogle() {
+  const { data, error } = await supabase.auth.signInWithOAuth({
+    provider: 'google',
+    options: {
+      redirectTo: `${window.location.origin}/dashboard`
+    }
+  });
+  if (error) throw error;
+  return data;
+}
+
+export async function signInWithFacebook() {
+  const { data, error } = await supabase.auth.signInWithOAuth({
+    provider: 'facebook',
+    options: {
+      redirectTo: `${window.location.origin}/dashboard`
+    }
+  });
+  if (error) throw error;
+  return data;
+}
+
+export async function signInWithApple() {
+  const { data, error } = await supabase.auth.signInWithOAuth({
+    provider: 'apple',
+    options: {
+      redirectTo: `${window.location.origin}/dashboard`
+    }
+  });
+  if (error) throw error;
+  return data;
+}
+
+export async function signOut() {
+  const { error } = await supabase.auth.signOut();
+  if (error) throw error;
+}
+
+export async function getCurrentUser() {
+  const { data: { user } } = await supabase.auth.getUser();
+  return user;
 }

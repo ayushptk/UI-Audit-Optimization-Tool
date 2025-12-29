@@ -1,9 +1,11 @@
 import { createSlice } from "@reduxjs/toolkit";
+import { supabase } from "../lib/supabase";
 
 const initialState = {
   token: typeof window !== "undefined" ? localStorage.getItem("access_token") : null,
   user: null,
   isAuthenticated: false,
+  supabaseUser: null,
 };
 
 const authSlice = createSlice({
@@ -22,6 +24,7 @@ const authSlice = createSlice({
       state.token = null;
       state.user = null;
       state.isAuthenticated = false;
+      state.supabaseUser = null;
 
       localStorage.removeItem("access_token");
       document.cookie =
@@ -31,8 +34,24 @@ const authSlice = createSlice({
       state.user = action.payload;
       state.isAuthenticated = true;
     },
+    setSupabaseUser: (state, action) => {
+      state.supabaseUser = action.payload;
+      state.isAuthenticated = true;
+    },
+    initializeSupabaseAuth: (state) => {
+      // Initialize Supabase auth listener
+      supabase.auth.onAuthStateChange((event, session) => {
+        if (session) {
+          state.supabaseUser = session.user;
+          state.isAuthenticated = true;
+        } else {
+          state.supabaseUser = null;
+          state.isAuthenticated = false;
+        }
+      });
+    },
   },
 });
 
-export const { setCredentials, logout, setUser } = authSlice.actions;
+export const { setCredentials, logout, setUser, setSupabaseUser, initializeSupabaseAuth } = authSlice.actions;
 export default authSlice.reducer;

@@ -13,6 +13,10 @@ import {
   FaLock,
   FaChartLine,
 } from 'react-icons/fa';
+import { motion, useScroll, useTransform } from "framer-motion";
+import { Instrument_Serif } from 'next/font/google';
+
+const instrumentSerif = Instrument_Serif({ weight: '400', subsets: ['latin'] });
 
 const Feature = () => {
   const column1 = [
@@ -100,7 +104,7 @@ const Feature = () => {
   ];
 
   const renderColumn = (features, direction) => (
-    <div className="overflow-hidden h-[450px] w-84">
+    <div className="overflow-hidden h-[450px] w-72">
       <div className={`flex flex-col gap-6 ${direction === 'up' ? 'animate-scroll-up' : 'animate-scroll-down'}`}>
         {[...features, ...features].map((feature, index) => (
           <div
@@ -108,7 +112,7 @@ const Feature = () => {
             className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-2 text-center"
           >
             <div className="flex justify-center mb-4 "><span className='bg-gray-100 p-4 rounded-full'>{feature.icon}</span></div>
-            <h3 className="text-md font-semibold text-gray-900 mb-2">{feature.title}</h3>
+            <h3 className={`text-xl ${instrumentSerif.className} text-gray-900 mb-2`}>{feature.title}</h3>
             <p className="text-gray-600 text-sm">{feature.description}</p>
           </div>
         ))}
@@ -118,18 +122,35 @@ const Feature = () => {
 
   return (
     <section className="py-10 px-6 bg-white">
-      <div className="max-w-6xl mx-auto text-center mb-16">
-        <button className="text-blue-900 border border-slate-700 px-6 py-2 rounded-3xl mb-6">
-          Features
-        </button>
-        <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
-          Powerful Features for Better Design
-        </h2>
-        <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-          Our AI comprehensively analyzes your UI designs, giving you insights to build visually stunning and accessible experiences.
-        </p>
-      </div>
-
+       <div className="text-center max-w-3xl mx-auto mb-20">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5 }}
+            >
+              <h2 className={`text-4xl sm:text-5xl ${instrumentSerif.className} text-gray-900 mb-6 tracking-tight`}>
+                Powerful features <br className="hidden sm:block" />
+                at <span style={{ position: 'relative', display: 'inline-block', zIndex: 1 }}>
+                  <span style={{ 
+                    position: 'absolute', 
+                    bottom: '4px', 
+                    left: '-2px', 
+                    right: '-2px', 
+                    height: '14px', 
+                    backgroundColor: '#FEF08A', // Slightly darker yellow (yellow-200) for better visibility
+                    borderRadius: '4px',
+                    transform: 'rotate(-4deg)',
+                    zIndex: -1
+                  }}></span>
+                  <span style={{ position: 'relative' }}>UI Audit</span>
+                </span>
+              </h2>
+              <p className="text-lg text-gray-500 leading-relaxed">
+                Analyze your interface instantly and uncover hidden UX issues with smart, data driven recommendations.
+              </p>
+            </motion.div>
+          </div>
       <div className="grid grid-cols-1 md:grid-cols-3  justify-items-center">
         {renderColumn(column1, 'up')}
         {renderColumn(column2, 'down')}

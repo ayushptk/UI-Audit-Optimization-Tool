@@ -35,6 +35,7 @@ export default function Login() {
                             user: res.user,
                         })
                     );
+                    router.push("/dashboard");
                 } catch (error) {
                     console.error("OAuth backend login failed:", error);
                 }
@@ -42,7 +43,7 @@ export default function Login() {
             dispatch(setSupabaseSession(session));
         });
         return () => subscription.unsubscribe();
-    }, [dispatch]);
+    }, [dispatch, router]);
 
     const handleInputChange = (e) => {
         const { name, value, type, checked } = e.target;

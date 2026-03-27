@@ -1,3 +1,4 @@
+'use client';
 import { useEffect, useRef, useState } from 'react';
 import { motion } from 'motion/react';
 
@@ -61,7 +62,7 @@ const TrueFocus = ({
   };
 
   return (
-    <span className="focus-container" ref={containerRef}>
+    <span className="focus-container inline-flex" ref={containerRef}>
       {words.map((word, index) => {
         const isActive = index === currentIndex;
         return (
@@ -89,8 +90,8 @@ const TrueFocus = ({
         );
       })}
 
-      <motion.div
-        className="focus-frame"
+      <motion.span
+        className="focus-frame block"
         animate={{
           x: focusRect.x,
           y: focusRect.y,
@@ -110,7 +111,7 @@ const TrueFocus = ({
         <span className="corner top-right"></span>
         <span className="corner bottom-left"></span>
         <span className="corner bottom-right"></span>
-      </motion.div>
+      </motion.span>
     </span>
   );
 };

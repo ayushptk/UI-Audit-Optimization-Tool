@@ -1,6 +1,6 @@
 import { supabase } from './supabase';
 
-const BASE_URL = "http://127.0.0.1:8000";
+const BASE_URL = "https://fastapi-backend-s1rw.onrender.com";
 
 export async function login(email, password) {
   const res = await fetch(`${BASE_URL}/auth/login`, {
@@ -84,4 +84,20 @@ export async function signOut() {
 export async function getCurrentUser() {
   const { data: { user } } = await supabase.auth.getUser();
   return user;
+}
+
+export async function handleOAuthLogin(supabaseUser) {
+  const res = await fetch(`${BASE_URL}/auth/oauth-login`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      email: supabaseUser.email,
+      name: supabaseUser.user_metadata?.full_name || supabaseUser.email.split('@')[0],
+      provider: supabaseUser.app_metadata?.provider || 'google'
+    }),
+  });
+
+  if (!res.ok) throw new Error("OAuth login failed");
+
+  return res.json(); // { access_token, user }
 }

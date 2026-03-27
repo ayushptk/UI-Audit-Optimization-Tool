@@ -28,7 +28,7 @@ export default function CategoryBreakdown({ breakdown }) {
         return mapped.length > 0 ? mapped : defaultData;
     }, [breakdown]);
 
-    const totalValue = useMemo(() => data.reduce((acc, cur) => acc + cur.value, 0) || 1, [data]);
+    const totalValue = useMemo(() => data.reduce((acc, cur) => acc + cur.value, 0) || 0, [data]);
 
     const [hoveredIndex, setHoveredIndex] = useState(null);
 

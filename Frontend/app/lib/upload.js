@@ -3,7 +3,7 @@ export async function uploadFile(file, token) {
   const formData = new FormData();
   formData.append("file", file);
 
-  const res = await fetch("http://localhost:8000/api/upload", {
+  const res = await fetch("https://fastapi-backend-s1rw.onrender.com/api/upload", {
     method: "POST",
     headers: {
       Authorization: `Bearer ${token}`,

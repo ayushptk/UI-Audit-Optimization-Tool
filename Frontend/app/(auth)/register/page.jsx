@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
-import { FiEye, FiEyeOff, FiMail, FiLock, FiArrowRight, FiUser } from 'react-icons/fi';
+import { FiEye, FiEyeOff, FiMail, FiLock, FiArrowRight, FiUser, FiLoader } from 'react-icons/fi';
 import { useDispatch } from 'react-redux';
 import { setCredentials } from "../../redux/authSlice";
 import { login, registerUser } from '../../lib/auth';
@@ -13,6 +13,7 @@ export default function Register() {
     const router = useRouter();
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
     const [formData, setFormData] = useState({
         username: '',
         email: '',
@@ -31,13 +32,15 @@ export default function Register() {
 
     async function handleSubmit(e) {
         e.preventDefault();
-        console.log('Registration data:', formData);
-
+        
         // Password confirmation validation
         if (formData.password !== formData.confirmPassword) {
             alert('Passwords do not match');
             return;
         }
+
+        setIsLoading(true);
+        console.log('Registration data:', formData);
 
         try {
             // Register the user
@@ -62,6 +65,8 @@ export default function Register() {
         } catch (error) {
             console.error("Registration failed:", error);
             alert("Registration failed. Please try again.");
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -257,10 +262,20 @@ export default function Register() {
                                 {/* Register Button */}
                                 <button
                                     type="submit"
-                                    className="w-full bg-indigo-600 text-white py-3 px-4 rounded-xl hover:from-teal-700 hover:to-teal-800 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 transition-all duration-200 font-medium flex items-center justify-center gap-2"
+                                    disabled={isLoading}
+                                    className={`w-full bg-indigo-600 text-white py-3 px-4 rounded-xl hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-all duration-200 font-medium flex items-center justify-center gap-2 ${isLoading ? 'opacity-70 cursor-not-allowed' : ''}`}
                                 >
-                                    Register
-                                    <FiArrowRight className="w-4 h-4" />
+                                    {isLoading ? (
+                                        <>
+                                            Registering...
+                                            <FiLoader className="w-4 h-4 animate-spin" />
+                                        </>
+                                    ) : (
+                                        <>
+                                            Register
+                                            <FiArrowRight className="w-4 h-4" />
+                                        </>
+                                    )}
                                 </button>
                             </form>
 

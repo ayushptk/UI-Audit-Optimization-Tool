@@ -6,6 +6,9 @@ import { motion } from "framer-motion";
 import { FiFileText, FiTrendingUp, FiAlertCircle, FiCheckCircle, FiClock, FiArrowRight, FiFilter, FiDownload } from "react-icons/fi";
 import jsPDF from 'jspdf';
 import { toPng } from 'html-to-image';
+import { useSelector } from "react-redux";
+
+const BASE_URL = "https://fastapi-backend-s1rw.onrender.com";
 
 function Badge({ tone = "neutral", children }) {
   const styles = {
@@ -78,6 +81,7 @@ function ScorePill({ score }) {
 }
 
 export default function ReportsOverviewPage() {
+  const { token } = useSelector((state) => state.auth);
   const [reports, setReports] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -88,8 +92,7 @@ export default function ReportsOverviewPage() {
       setLoading(true);
       setError(null);
       try {
-        const token = typeof window !== "undefined" ? localStorage.getItem("access_token") : null;
-        const res = await fetch("http://localhost:8000/api/designs", {
+        const res = await fetch(`${BASE_URL}/api/designs`, {
           headers: token ? { Authorization: `Bearer ${token}` } : {},
         });
         if (!res.ok) throw new Error(`HTTP ${res.status}`);

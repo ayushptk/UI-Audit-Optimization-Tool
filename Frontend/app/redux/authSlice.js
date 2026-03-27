@@ -2,7 +2,7 @@ import { createSlice } from "@reduxjs/toolkit";
 import { supabase } from "../lib/supabase";
 
 const initialState = {
-  token: typeof window !== "undefined" ? localStorage.getItem("access_token") : null,
+  token: null,
   user: null,
   isAuthenticated: false,
   supabaseUser: null,

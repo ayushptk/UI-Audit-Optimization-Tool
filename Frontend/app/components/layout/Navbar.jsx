@@ -44,10 +44,10 @@ const Navbar = () => {
       initial="hidden"
       animate="visible"
     >
-      <div className="mx-auto bg-white/10 border border-white/20 rounded-full px-4 sm:px-6 py-3 shadow-lg max-w-5xl backdrop-blur">
-        {/* Top row: logo + desktop nav + CTA + mobile toggle */}
+      <div className="mx-auto   px-4 sm:px-6 py-3 max-w-5xl ">
+      
         <div className="flex items-center justify-between w-full gap-3">
-          {/* Left: Logo */}
+          
           <div className="flex items-center gap-3">
             <Image
               src="/Logo/Uiauditlogo.png"
@@ -65,7 +65,7 @@ const Navbar = () => {
               <Link
                 key={item.name}
                 href={item.href}
-                className="text-gray-700 hover:text-blue-600 transition-colors duration-300 font-medium"
+                className="text-gray-100 hover:text-white hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.8)] transition-all duration-300 font-medium"
               >
                 {item.name}
               </Link>
@@ -73,13 +73,13 @@ const Navbar = () => {
           </div>
 
           {/* Right: Desktop CTA */}
-          <div className="hidden sm:block">
+          <div className="hidden sm:block ">
             <Link
               href="/login"
-              className="flex items-center space-x-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white px-6 py-2 rounded-full font-semibold hover:from-blue-600 hover:to-purple-700 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl"
+              className="flex items-center space-x-2  text-white px-6 py-2 rounded-full font-semibold hover:from-blue-600 hover:to-purple-700 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl"
             >
               <IoRocketOutline className="w-5 h-5 animate-pulse" />
-              <span className="whitespace-nowrap">Get Started</span>
+              <span className="whitespace-nowrap ">Get Started</span>
             </Link>
           </div>
 
@@ -88,7 +88,7 @@ const Navbar = () => {
             aria-label="Toggle menu"
             aria-expanded={open}
             onClick={() => setOpen((v) => !v)}
-            className="sm:hidden inline-flex items-center justify-center rounded-full p-2 text-gray-700 hover:bg-white/20 transition"
+            className="sm:hidden inline-flex items-center justify-center rounded-full p-2 text-white hover:bg-white/20 transition"
           >
             {open ? <HiOutlineX className="w-6 h-6" /> : <HiOutlineMenu className="w-6 h-6" />}
           </button>

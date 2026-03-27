@@ -1,143 +1,126 @@
 'use client';
 
-import React from 'react';
-import { FaArrowRight } from 'react-icons/fa';
-import { motion } from 'framer-motion';
+import React, { useRef } from 'react';
+import { FaArrowRight, FaChevronDown } from 'react-icons/fa';
+import { motion, useScroll, useTransform } from 'framer-motion';
 import { useRouter } from 'next/navigation';
-import LiquidEther from './Liquidether';
-import MagnetizeButton from './magnetize-button';
-import Prism from './Prism';
+import Image from 'next/image';
 import TrueFocus from './TrueFocus';
+
 const Herosection = () => {
   const router = useRouter();
+  const ref = useRef(null);
+
+  const { scrollYProgress } = useScroll({
+    target: ref,
+    offset: ["start start", "end start"]
+  });
+
+  // Parallax effects
+  const backgroundY = useTransform(scrollYProgress, [0, 1], ["0%", "50%"]);
+  const textY = useTransform(scrollYProgress, [0, 1], ["0%", "20%"]);
+  const opacity = useTransform(scrollYProgress, [0, 0.8], [1, 0]);
 
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
-      transition: {
-        delayChildren: 0.3,
-        staggerChildren: 0.2,
-      },
+      transition: { delayChildren: 0.3, staggerChildren: 0.2 },
     },
   };
 
   const itemVariants = {
-    hidden: { y: 20, opacity: 0 },
-    visible: {
-      y: 0,
-      opacity: 1,
-      transition: {
-        duration: 0.8,
-        ease: 'easeOut',
-      },
-    },
-  };
-
-  const buttonVariants = {
-    hidden: { scale: 0.8, opacity: 0 },
-    visible: {
-      scale: 1,
-      opacity: 1,
-      transition: {
-        duration: 0.6,
-        ease: 'easeOut',
-      },
-    },
+    hidden: { y: 30, opacity: 0 },
+    visible: { y: 0, opacity: 1, transition: { duration: 0.8, ease: 'easeOut' } },
   };
 
   return (
-    <section className="relative py-20 px-4 min-h-screen flex items-center bg-white">
-      <div style={{ width: '100%', height: '100vh', position: 'absolute', top: 0, left: 0 }}>
-
-
-
-        <Prism
-
-          animationType="rotate"
-
-          timeScale={0.5}
-
-          height={3.5}
-
-          baseWidth={5.5}
-
-          scale={3.6}
-
-          hueShift={0}
-
-          colorFrequency={1}
-
-          noise={0}
-
-          glow={1}
-
+    <section ref={ref} className="relative w-full h-screen overflow-hidden bg-black flex items-center justify-center">
+      {/* Background Image with Parallax */}
+      <motion.div 
+        className="absolute inset-0 z-0"
+        style={{ y: backgroundY }}
+      >
+        <Image
+          src="/Images/uiaudittareeyy.png"
+          alt="UI Audit Background"
+          fill
+          className="object-cover object-center opacity-60"
+          priority
         />
-      </div>
+        {/* Dark overlay to ensure text readability */}
+        <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/40 to-black/90" />
+      </motion.div>
+
+      {/* Main Content */}
       <motion.div
-        className="relative z-10 max-w-6xl mx-auto text-center"
+        className="relative z-10 w-full max-w-7xl mx-auto px-4 text-center mt-16"
+        style={{ y: textY, opacity }}
         variants={containerVariants}
         initial="hidden"
         animate="visible"
       >
         <motion.h1
-          className="text-5xl md:text-7xl font-bold text-gray-900 mb-6 leading-tight mt-8"
+          className="text-2xl sm:text-3xl md:text-4xl lg:text-[4rem] leading-none font-extrabold text-white mb-6 tracking-tight drop-shadow-2xl"
           variants={itemVariants}
         >
-          <div>
-            <span className="text-[16px] border border-slate-700  px-4 py-3 rounded-full font-small">#1 Audit Platform</span>
-          </div>
-
-          <span className="">
-            Revolutionize Your UI with  Automated{' '}
-            <motion.span
-              className="text-indigo-600 inline-block align-baseline"
-              initial={{ color: '#6B7280' }}
-              animate={{ color: '#4F46E5' }}
-              transition={{ duration: 1, delay: 1 }}
-            >
-              <TrueFocus
-                sentence="UX Insights"
-                manualMode={false}
-                blurAmount={5}
-                borderColor="red"
-                animationDuration={2}
-                pauseBetweenAnimations={1}
-              />
-            </motion.span>
-          </span>
+          Revolutionize Your{' '}
+          <motion.span
+            className="block mt-4"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 1, delay: 0.5 }}
+          > 
+            <TrueFocus
+              sentence="UX Insights"
+              manualMode={false}
+              blurAmount={5}
+              borderColor="rgba(99, 102, 241, 0.8)"
+              animationDuration={2}
+              pauseBetweenAnimations={1}
+            />
+          </motion.span>
         </motion.h1>
+
         <motion.p
-          className="text-xl md:text-xl text-gray-600 mb-10 max-w-3xl mx-auto"
+          className="text-lg md:text-xl text-gray-200 mb-12 max-w-3xl mx-auto font-light drop-shadow-lg"
           variants={itemVariants}
         >
-          Upload your designs and get instant feedback on usability, accessibility, visual hierarchy, and consistency. Perfect for designers, product teams, and developers.
+          Upload your designs and get instant feedback on usability, accessibility, visual hierarchy, and consistency.
         </motion.p>
+
         <motion.div
-          className="flex  sm:flex-row justify-center gap-4 "
-          variants={containerVariants}
+          className="flex flex-col sm:flex-row justify-center gap-6"
+          variants={itemVariants}
         >
-     
-          <motion.button
-            className="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2 rounded-lg font-bold text-lg transition duration-300 flex items-center justify-center gap-2 cursor-pointer"
-            variants={buttonVariants}
-            whileHover="hover"
+          <button
+            className="group bg-indigo-600 hover:bg-indigo-500 text-white px-6 py-3 rounded-full font-bold text-lg transition-all duration-300 flex items-center justify-center gap-3 cursor-pointer shadow-[0_0_20px_rgba(79,70,229,0.4)] hover:shadow-[0_0_30px_rgba(99,102,241,0.6)] transform hover:-translate-y-1"
             onClick={() => router.push('/login')}
           >
-            Get Started Free <FaArrowRight />
-          </motion.button>
-       
-
-
-          <motion.button
-            className="border-2 border-gray-300 hover:border-gray-400 text-gray-700 px-6 py-2 rounded-lg font-bold text-lg transition duration-300  cursor-pointer"
-            variants={buttonVariants}
-            whileHover="hover"
+            Get Started Free 
+            <FaArrowRight className="group-hover:translate-x-1 transition-transform" />
+          </button>
+          <button
+            className="border-2 border-white/30 hover:border-white/80 hover:bg-white/10 text-white px-6 py-3 rounded-full font-bold text-lg transition-all duration-300 backdrop-blur-sm cursor-pointer"
           >
             Learn More
-          </motion.button>
+          </button>
+        </motion.div>
+      </motion.div>
 
-
+      {/* Scroll Down Indicator */}
+      <motion.div 
+        className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 text-white flex flex-col items-center gap-2"
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 1.5, duration: 1 }}
+      >
+        <span className="text-xs sm:text-sm font-medium tracking-[0.3em] uppercase opacity-70">Scroll</span>
+        <motion.div
+          animate={{ y: [0, 8, 0] }}
+          transition={{ repeat: Infinity, duration: 1.5, ease: "easeInOut" }}
+        >
+          <FaChevronDown className="text-xl sm:text-2xl opacity-70" />
         </motion.div>
       </motion.div>
     </section>

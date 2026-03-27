@@ -1,4 +1,4 @@
-const BASE_URL = "http://127.0.0.1:8000/api/ai-analysis";
+const BASE_URL = "https://fastapi-backend-s1rw.onrender.com/api/ai-analysis";
 
 export async function analyzeDesignById(designId, authToken) {
   const response = await fetch(BASE_URL, {

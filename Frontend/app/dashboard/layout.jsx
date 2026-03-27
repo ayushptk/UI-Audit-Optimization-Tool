@@ -254,7 +254,7 @@ export default function DashboardLayout({ children }) {
                 <button className="relative group">
                   <div className="absolute inset-0 bg-indigo-500 rounded-full blur opacity-20 group-hover:opacity-40 transition-opacity"></div>
                   <Image
-                    src="/images/manxa.png"
+                    src="/Images/illust.avif"
                     alt="Profile"
                     width={40}
                     height={40}

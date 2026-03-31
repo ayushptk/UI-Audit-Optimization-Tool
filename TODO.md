@@ -1,2 +1,0 @@
-- [x] Edit Herosection.jsx to add GridScan component inside the section element before motion.div
-- [ ] Verify the changes by running the frontend development server

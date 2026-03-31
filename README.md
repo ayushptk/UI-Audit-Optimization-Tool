@@ -4,7 +4,7 @@ Welcome to **UI Audit**, a comprehensive tool designed to analyze, evaluate, and
 
 ---
 
-## 🚀 Overview
+##  Overview
 
 UI Audit provides an end to end solution for teams looking to maintain high visual and functional standards in their products. From initial landing page evaluation to detailed dashboard metrics, UI Audit is your ultimate companion in creating seamless digital experiences.
 
@@ -12,19 +12,19 @@ UI Audit provides an end to end solution for teams looking to maintain high visu
 
 ---
 
-## ✨ Features
+##  Features
 
-- ** UI/UX Evaluation Checklist**: A structured approach to assessing visual and functional quality.
-- ** Accessibility Analysis**: In-depth checks based on WCAG standards to ensure inclusivity.
-- ** Performance Insights**: Real-time analysis of UI loading speeds and responsiveness.
-- ** Responsive Design Audit**: Ensuring consistency and usability across all device sizes.
-- ** Visual Consistency Checks**: Identifying discrepancies in typography, spacing, and color palettes.
-- ** AI-Powered Suggestions**: Leverages intelligence to provide actionable UX improvements.
-- ** Score-based UI Rating**: A definitive system to track and improve your UI quality over time.
+- **UI/UX Evaluation Checklist**: A structured approach to assessing visual and functional quality.
+- **Accessibility Analysis**: In-depth checks based on WCAG standards to ensure inclusivity.
+- **Performance Insights**: Real-time analysis of UI loading speeds and responsiveness.
+- **Responsive Design Audit**: Ensuring consistency and usability across all device sizes.
+- **Visual Consistency Checks**: Identifying discrepancies in typography, spacing, and color palettes.
+- **AI-Powered Suggestions**: Leverages intelligence to provide actionable UX improvements.
+- **Score-based UI Rating**: A definitive system to track and improve your UI quality over time.
 
 ---
 
-## 🛠️ Tech Stack
+##  Tech Stack
 
 ### Frontend
 - **Framework**: [Next.js](https://nextjs.org/) (App Router)
@@ -63,15 +63,18 @@ Ui-Audit/
 
 ---
 
-## 🖼️ Screenshots
+##  Screenshots
 
-| Landing Page | Dashboard |
-| :---: | :---: |
-| ![Landing Page Preview](Assests/Landingpage.png)  |  ![Pricing Page Preview](Assests/Pricing.png) | ![Dashboard Preview](Assests/Dashboard.png) | ![Reports Page](Assests/Reports.png) |
+| Landing Page | Pricing | Dashboard | Reports |
+| :---: | :---: | :---: | :---: |
+| ![Landing Page Preview](Assests/Landingpage.png)  
+  ![Pricing Page Preview](Assests/Pricing.png) 
+  ![Dashboard Preview](Assests/Dashboard.png) 
+  ![Reports Page](Assests/Reports.png) |
 
 ---
 
-## 🏁 Getting Started
+##  Getting Started
 
 ### Prerequisites
 - Node.js (v18+)
@@ -96,7 +99,7 @@ npm run dev
 
 ---
 
-## 📄 License
+##  License
 
 This project is licensed under the [MIT License](LICENSE).
 

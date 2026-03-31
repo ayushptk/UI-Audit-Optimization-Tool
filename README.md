@@ -65,9 +65,7 @@ Ui-Audit/
 
 ##  Screenshots
 
-| Landing Page | Pricing | Dashboard | Reports |
-| :---: | :---: | :---: | :---: |
-| ![Landing Page Preview](Assests/Landingpage.png)  
+ ![Landing Page Preview](Assests/Landingpage.png)  
   ![Pricing Page Preview](Assests/Pricing.png) 
   ![Dashboard Preview](Assests/Dashboard.png) 
   ![Reports Page](Assests/Reports.png) |

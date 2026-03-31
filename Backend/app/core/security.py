@@ -1,11 +1,14 @@
-
+import os
+from dotenv import load_dotenv
 from passlib.context import CryptContext
 from datetime import datetime, timedelta
 import jwt
 
-SECRET_KEY = "UIAUDIT"
-ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24 * 7
+load_dotenv()
+
+SECRET_KEY = os.getenv("SECRET_KEY", "UIAUDIT")
+ALGORITHM = os.getenv("ALGORITHM", "HS256")
+ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", 60 * 24 * 7))
 
 pwd_context = CryptContext(
     schemes=["argon2"],

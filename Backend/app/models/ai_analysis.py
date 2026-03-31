@@ -14,4 +14,5 @@ class AiAnalysis(Base):
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
     design = relationship("Design", backref="ai_analyses")
+    
     user = relationship("User")

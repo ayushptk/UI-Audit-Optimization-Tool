@@ -2,48 +2,56 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
-import { FiEye, FiEyeOff, FiMail, FiLock, FiArrowRight, FiUser } from 'react-icons/fi';
+import { FiEye, FiEyeOff, FiMail, FiLock, FiArrowRight, FiUser, FiLoader } from 'react-icons/fi';
 import { useDispatch } from 'react-redux';
-import { setCredentials, setSupabaseSession } from "../../redux/authSlice";
-import { login, signInWithGoogle, signInWithFacebook, signInWithApple } from '../../lib/auth';
+import { setCredentials } from "../../redux/authSlice";
+import { login, handleGoogleLogin } from '../../lib/auth';
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
-import { supabase } from '../../lib/supabase';
+import { useGoogleLogin } from '@react-oauth/google';
+import toast from 'react-hot-toast';
 
 export default function Login() {
     const dispatch = useDispatch();
     const router = useRouter();
 
     const [showPassword, setShowPassword] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
+    const [errorMsg, setErrorMsg] = useState("");
     const [formData, setFormData] = useState({
         email: '',
         password: '',
         rememberMe: false
     });
 
-    useEffect(() => {
-        const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-            if (session && session.user) {
-                try {
-                    // For OAuth, get backend token
-                    const { handleOAuthLogin } = await import('../../lib/auth');
-                    const res = await handleOAuthLogin(session.user);
-                    document.cookie = `token=${res.access_token}; path=/;`;
-                    dispatch(
-                        setCredentials({
-                            token: res.access_token,
-                            user: res.user,
-                        })
-                    );
-                    router.push("/dashboard");
-                } catch (error) {
-                    console.error("OAuth backend login failed:", error);
-                }
+    const handleGoogleAuth = useGoogleLogin({
+        onSuccess: async (tokenResponse) => {
+            setIsLoading(true);
+            try {
+                const res = await handleGoogleLogin(tokenResponse.access_token);
+                document.cookie = `token=${res.access_token}; path=/;`;
+                dispatch(
+                    setCredentials({
+                        token: res.access_token,
+                        user: res.user,
+                    })
+                );
+                toast.success("Login successfully");
+                router.push("/dashboard");
+            } catch (error) {
+                console.error("Google login failed:", error);
+                const msg = error.message || "Google login failed.";
+                setErrorMsg(msg);
+                toast.error(msg);
+            } finally {
+                setIsLoading(false);
             }
-            dispatch(setSupabaseSession(session));
-        });
-        return () => subscription.unsubscribe();
-    }, [dispatch, router]);
+        },
+        onError: () => {
+            console.error('Google Login Failed');
+            setErrorMsg("Google login failed.");
+            toast.error("Google login failed.");
+        }
+    });
 
     const handleInputChange = (e) => {
         const { name, value, type, checked } = e.target;
@@ -55,6 +63,8 @@ export default function Login() {
 
     async function handleSubmit(e) {
         e.preventDefault();
+        setErrorMsg("");
+        setIsLoading(true);
         console.log('Login data:', formData);
         try {
             const res = await login(formData.email, formData.password);
@@ -68,9 +78,15 @@ export default function Login() {
                 })
             );
 
+            toast.success("Login successfully");
             router.push("/dashboard");
         } catch (error) {
             console.error("Login failed:", error);
+            const msg = error.message || "An unexpected error occurred.";
+            setErrorMsg(msg);
+            toast.error(msg);
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -100,14 +116,10 @@ export default function Login() {
                             <div className="flex justify-center space-x-4 mb-6">
                                 {/* Google */}
                                 <button
-                                    onClick={async () => {
-                                        try {
-                                            await signInWithGoogle();
-                                        } catch (error) {
-                                            console.error("Google sign-in failed:", error);
-                                        }
-                                    }}
-                                    className="flex items-center justify-center bg-white border border-gray-200 text-gray-700 py-3 px-4 rounded-xl hover:bg-gray-50 hover:border-gray-300 transition-all duration-200 font-medium text-sm"
+                                    type="button"
+                                    onClick={() => handleGoogleAuth()}
+                                    disabled={isLoading}
+                                    className={`flex items-center justify-center bg-white border border-gray-200 text-gray-700 py-3 px-4 rounded-xl hover:bg-gray-50 hover:border-gray-300 transition-all duration-200 font-medium text-sm ${isLoading ? 'opacity-70 cursor-not-allowed' : ''}`}
                                 >
                                     <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24" fill="currentColor">
                                         <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" />
@@ -144,6 +156,11 @@ export default function Login() {
                             </div>
 
                             {/* Login Form */}
+                            {errorMsg && (
+                                <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-600 rounded-lg text-sm text-center">
+                                    {errorMsg}
+                                </div>
+                            )}
                             <form onSubmit={handleSubmit} className="space-y-6">
                                 {/* Email */}
                                 <div>
@@ -220,10 +237,20 @@ export default function Login() {
                                 {/* Login Button */}
                                 <button
                                     type="submit"
-                                    className="w-full bg-indigo-600 text-white py-3 px-4 rounded-xl hover:from-teal-700 hover:to-teal-800 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 transition-all duration-200 font-medium flex items-center justify-center gap-2"
+                                    disabled={isLoading}
+                                    className={`w-full bg-indigo-600 text-white py-3 px-4 rounded-xl hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-all duration-200 font-medium flex items-center justify-center gap-2 ${isLoading ? 'opacity-70 cursor-not-allowed' : ''}`}
                                 >
-                                    Login
-                                    <FiArrowRight className="w-4 h-4" />
+                                    {isLoading ? (
+                                        <>
+                                            Logging in...
+                                            <FiLoader className="w-4 h-4 animate-spin" />
+                                        </>
+                                    ) : (
+                                        <>
+                                            Login
+                                            <FiArrowRight className="w-4 h-4" />
+                                        </>
+                                    )}
                                 </button>
                             </form>
 

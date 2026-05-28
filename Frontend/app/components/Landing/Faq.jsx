@@ -131,7 +131,7 @@ const Faq = () => {
       {/* Still Have Questions? section (Maintained from previous design) */}
       <section className="bg-[#F6F3FF] text-center text-black py-12 md:py-16">
         <div className="max-w-3xl mx-auto px-4 sm:px-6">
-          <h2 className={`text-2xl sm:text-3xl lg:text-3xl ${instrumentSerif.className} mb-4 text-[#0f172a]`}>
+          <h2 className={`text-2xl sm:text-3xl lg:text-3xl ${instrumentSerif.className} mb-4 text-[#0f172a] font-bold`}>
             Still Have Questions?
           </h2>
 

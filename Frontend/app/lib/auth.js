@@ -1,6 +1,5 @@
-import { supabase } from './supabase';
 
-const BASE_URL = "https://fastapi-backend-s1rw.onrender.com";
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
 export async function login(email, password) {
   const res = await fetch(`${BASE_URL}/auth/login`, {
@@ -9,9 +8,12 @@ export async function login(email, password) {
     body: JSON.stringify({ email, password }),
 
   });
-  console.log("The data is " + res);
+  console.log("The data is ", res);
 
-  if (!res.ok) throw new Error("Invalid login");
+  if (!res.ok) {
+    const errorData = await res.json().catch(() => ({}));
+    throw new Error(errorData.detail || "Invalid login");
+  }
 
   return res.json(); // { access_token }
 }
@@ -23,7 +25,10 @@ export async function registerUser(username, email, password) {
     body: JSON.stringify({ username, email, password }),
   });
 
-  if (!res.ok) throw new Error("Register failed");
+  if (!res.ok) {
+    const errorData = await res.json().catch(() => ({}));
+    throw new Error(errorData.detail || "Register failed");
+  }
 
   return res.json();
 }
@@ -37,67 +42,25 @@ export async function fetchUserProfile(token) {
     },
   });
 
-  if (!res.ok) throw new Error("Failed to fetch user profile");
+  if (!res.ok) {
+    const errorData = await res.json().catch(() => ({}));
+    throw new Error(errorData.detail || "Failed to fetch user profile");
+  }
 
   return res.json();
 }
 
-// Supabase OAuth functions
-export async function signInWithGoogle() {
-  const { data, error } = await supabase.auth.signInWithOAuth({
-    provider: 'google',
-    options: {
-      redirectTo: `${window.location.origin}/dashboard`
-    }
-  });
-  if (error) throw error;
-  return data;
-}
-
-export async function signInWithFacebook() {
-  const { data, error } = await supabase.auth.signInWithOAuth({
-    provider: 'facebook',
-    options: {
-      redirectTo: `${window.location.origin}/dashboard`
-    }
-  });
-  if (error) throw error;
-  return data;
-}
-
-export async function signInWithApple() {
-  const { data, error } = await supabase.auth.signInWithOAuth({
-    provider: 'apple',
-    options: {
-      redirectTo: `${window.location.origin}/dashboard`
-    }
-  });
-  if (error) throw error;
-  return data;
-}
-
-export async function signOut() {
-  const { error } = await supabase.auth.signOut();
-  if (error) throw error;
-}
-
-export async function getCurrentUser() {
-  const { data: { user } } = await supabase.auth.getUser();
-  return user;
-}
-
-export async function handleOAuthLogin(supabaseUser) {
-  const res = await fetch(`${BASE_URL}/auth/oauth-login`, {
+export async function handleGoogleLogin(credential) {
+  const res = await fetch(`${BASE_URL}/auth/google`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      email: supabaseUser.email,
-      name: supabaseUser.user_metadata?.full_name || supabaseUser.email.split('@')[0],
-      provider: supabaseUser.app_metadata?.provider || 'google'
-    }),
+    body: JSON.stringify({ token: credential }),
   });
 
-  if (!res.ok) throw new Error("OAuth login failed");
+  if (!res.ok) {
+    const errorData = await res.json().catch(() => ({}));
+    throw new Error(errorData.detail || "Google login failed");
+  }
 
   return res.json(); // { access_token, user }
 }

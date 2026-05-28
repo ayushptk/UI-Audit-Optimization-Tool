@@ -6,7 +6,7 @@ import Image from 'next/image';
 
 const Footer = () => {
   return (
-    <footer className="w-full bg-[#F5F4F9] relative pt-16 flex flex-col font-sans overflow-hidden">
+    <footer className="w-full bg-[#F5F4F9] relative   flex flex-col font-sans overflow-hidden">
       <div className="max-w-[1280px] w-full mx-auto px-6 md:px-12 lg:px-16 relative z-10">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12 mb-10">
           {/* Get in Touch */}
@@ -78,15 +78,7 @@ const Footer = () => {
 
       {/* Background Graphic Illustration */}
       <div className="w-full relative flex flex-col pointer-events-none mt-2">
-        <div className="w-full h-auto opacity-40">
-          <Image 
-            src="/Images/footerimages.png" 
-            alt="Cityscape illustration" 
-            width={1280}
-            height={400}
-            className="w-full h-auto object-cover md:object-contain object-bottom"
-          />
-        </div>
+       
         
         {/* Copyright Details */}
         <div className="w-full bg-white relative z-10 2xl:-top-[20px] pointer-events-auto">

@@ -1,6 +1,6 @@
 import os
+import bcrypt
 from dotenv import load_dotenv
-from passlib.context import CryptContext
 from datetime import datetime, timedelta
 import jwt
 
@@ -10,19 +10,18 @@ SECRET_KEY = os.getenv("SECRET_KEY", "UIAUDIT")
 ALGORITHM = os.getenv("ALGORITHM", "HS256")
 ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", 60 * 24 * 7))
 
-pwd_context = CryptContext(
-    schemes=["argon2"],
-    deprecated="auto",
-    argon2__memory_cost=194560,
-    argon2__time_cost=4,
-    argon2__parallelism=4,
-)
-
 def hash_password(password: str) -> str:
-    return pwd_context.hash(password)
+    pwd_bytes = password.encode('utf-8')
+    salt = bcrypt.gensalt()
+    return bcrypt.hashpw(pwd_bytes, salt).decode('ascii')
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
-    return pwd_context.verify(plain_password, hashed_password)
+    try:
+        pwd_bytes = plain_password.encode('utf-8')
+        hash_bytes = hashed_password.encode('ascii')
+        return bcrypt.checkpw(pwd_bytes, hash_bytes)
+    except Exception:
+        return False
 
 def create_access_token(data: dict, expires_delta: timedelta | None = None):
     to_encode = data.copy()

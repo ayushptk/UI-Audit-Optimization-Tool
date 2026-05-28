@@ -1,10 +1,8 @@
 from app.database import engine
 from sqlalchemy import text
 
-print('Database connection test')
 try:
     with engine.connect() as conn:
         result = conn.execute(text('SELECT 1'))
-        print('DB connected successfully')
 except Exception as e:
-    print(f'DB connection failed: {e}')
+    pass

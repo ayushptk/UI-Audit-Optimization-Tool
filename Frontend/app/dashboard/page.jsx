@@ -50,14 +50,13 @@ export default function DashboardPage() {
             fetchUserProfile(token).then((userData) => {
                 dispatch(setUser(userData));
             }).catch((error) => {
-                console.error("Failed to fetch user profile:", error);
             });
         }
 
         if (token) {
             fetchDashboardStats(token).then(data => {
                 setDashboardData(data);
-            }).catch(err => console.error(err));
+            }).catch(err => {});
         }
     }, [token, user, dispatch]);
 
@@ -85,7 +84,6 @@ export default function DashboardPage() {
             pdf.addImage(dataUrl, 'PNG', 0, 0, dashboardRef.current.scrollWidth, dashboardRef.current.scrollHeight);
             pdf.save('dashboard-report.pdf');
         } catch (error) {
-            console.error("Export failed", error);
         }
     };
 

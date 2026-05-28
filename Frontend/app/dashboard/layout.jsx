@@ -58,7 +58,6 @@ export default function DashboardLayout({ children }) {
             dispatch(setUser(userWithCorrectName));
           })
           .catch(err => {
-            console.error("Failed to fetch user:", err);
             // If token is invalid, maybe clear it?
           });
       }

@@ -8,7 +8,6 @@ export async function login(email, password) {
     body: JSON.stringify({ email, password }),
 
   });
-  console.log("The data is ", res);
 
   if (!res.ok) {
     const errorData = await res.json().catch(() => ({}));

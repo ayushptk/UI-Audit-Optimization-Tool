@@ -43,7 +43,6 @@ export async function getAnalyses(designId, authToken) {
   if (!response.ok) {
     const text = await response.text();
     // log both to console for dev and return a structured error
-    console.error("getAnalyses failed", { url: url.toString(), status: response.status, body: text });
     const err = new Error(`HTTP ${response.status}: ${text}`);
     // attach raw body for callers that want to inspect it
     err.body = text;
@@ -52,10 +51,6 @@ export async function getAnalyses(designId, authToken) {
   }
 
   const data = await response.json();
-  // log successful fetch (trim large objects)
-  try {
-    console.debug("getAnalyses success", { url: url.toString(), status: response.status, length: Array.isArray(data) ? data.length : undefined });
-  } catch (e) {}
 
   return data;
 }

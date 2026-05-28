@@ -38,7 +38,6 @@ export default function Login() {
                 toast.success("Login successfully");
                 router.push("/dashboard");
             } catch (error) {
-                console.error("Google login failed:", error);
                 const msg = error.message || "Google login failed.";
                 setErrorMsg(msg);
                 toast.error(msg);
@@ -47,7 +46,6 @@ export default function Login() {
             }
         },
         onError: () => {
-            console.error('Google Login Failed');
             setErrorMsg("Google login failed.");
             toast.error("Google login failed.");
         }
@@ -65,7 +63,6 @@ export default function Login() {
         e.preventDefault();
         setErrorMsg("");
         setIsLoading(true);
-        console.log('Login data:', formData);
         try {
             const res = await login(formData.email, formData.password);
 
@@ -81,7 +78,6 @@ export default function Login() {
             toast.success("Login successfully");
             router.push("/dashboard");
         } catch (error) {
-            console.error("Login failed:", error);
             const msg = error.message || "An unexpected error occurred.";
             setErrorMsg(msg);
             toast.error(msg);

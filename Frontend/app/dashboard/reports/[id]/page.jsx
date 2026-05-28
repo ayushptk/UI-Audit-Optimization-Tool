@@ -214,7 +214,6 @@ export default function ReportPage() {
             if (mounted) setImageUrl(url);
           }
         } catch (imgErr) {
-          console.error("Failed to fetch image:", imgErr);
         }
 
         if (mounted) {
@@ -275,7 +274,6 @@ export default function ReportPage() {
 
       pdf.save(`report-${id}.pdf`);
     } catch (error) {
-      console.error("Export failed:", error);
     } finally {
       setIsExporting(false);
     }

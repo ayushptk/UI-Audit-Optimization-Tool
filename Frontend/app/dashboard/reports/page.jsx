@@ -113,7 +113,6 @@ export default function ReportsOverviewPage() {
               const jsonStr = match ? match[1] : analysisRaw;
               analysis = JSON.parse(jsonStr);
             } catch (e) {
-              console.error("Failed to parse analysis JSON", e);
               analysis = null;
             }
           }
@@ -190,7 +189,6 @@ export default function ReportsOverviewPage() {
       pdf.addImage(dataUrl, 'PNG', 0, 0, reportsRef.current.scrollWidth, reportsRef.current.scrollHeight);
       pdf.save('reports-summary.pdf');
     } catch (error) {
-      console.error("Export failed", error);
     }
   };
 

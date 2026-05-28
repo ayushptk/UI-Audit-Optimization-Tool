@@ -22,7 +22,6 @@ export default function RecentAudits({ audits = [] }) {
             // Reload to refresh stats and list
             window.location.reload();
         } catch (error) {
-            console.error("Error deleting audit:", error);
             alert("Error deleting audit");
         }
     };

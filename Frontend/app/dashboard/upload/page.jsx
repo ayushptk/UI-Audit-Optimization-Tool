@@ -140,7 +140,6 @@ export default function UploadPage() {
       }, 1000);
 
     } catch (err) {
-      console.error(err);
       setError(err.response?.data?.detail || "Upload or analysis failed. Please try again.");
       setProgress(0);
       setIsAnalyzing(false);

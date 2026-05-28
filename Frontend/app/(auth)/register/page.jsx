@@ -45,7 +45,6 @@ export default function Register() {
         }
 
         setIsLoading(true);
-        console.log('Registration data:', formData);
 
         try {
             // Register the user
@@ -69,7 +68,6 @@ export default function Register() {
             toast.success("Signup successfully");
             router.push("/dashboard");
         } catch (error) {
-            console.error("Registration failed:", error);
             const msg = error.message || "Registration failed. Please try again.";
             setErrorMsg(msg);
             toast.error(msg);

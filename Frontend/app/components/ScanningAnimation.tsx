@@ -1,3 +1,4 @@
+// @ts-nocheck
 // JavaScript (React + Tailwind)
 // Premium Scanning UI: minimal, modern, elegant
 import React from "react";

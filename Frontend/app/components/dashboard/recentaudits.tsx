@@ -8,7 +8,7 @@ import { deleteAudit } from '../../lib/api';
 
 export default function RecentAudits({ audits = [] }) {
     const router = useRouter();
-    const { token } = useSelector((state) => state.auth);
+    const { token } = useSelector((state: any) => state.auth);
 
     const handleView = (id) => {
         router.push(`/dashboard/reports/${id}`);
@@ -100,3 +100,4 @@ export default function RecentAudits({ audits = [] }) {
         </div>
     );
 }
+

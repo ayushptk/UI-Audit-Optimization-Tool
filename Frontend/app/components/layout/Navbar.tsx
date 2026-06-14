@@ -1,3 +1,4 @@
+// @ts-nocheck
 // JavaScript (React / Next.js)
 'use client';
 

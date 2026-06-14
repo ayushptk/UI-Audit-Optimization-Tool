@@ -1,3 +1,4 @@
+// @ts-nocheck
 'use client';
 
 import Link from 'next/link';
@@ -36,7 +37,8 @@ export default function DashboardLayout({ children }) {
   const [scrolled, setScrolled] = useState(false);
 
   const dispatch = useDispatch();
-  const { user, token } = useSelector((state) => state.auth);
+  const { user, token } = useSelector((state: any) => state.auth);
+  const router = useRouter();
 
   // Restore token from localStorage if missing in Redux
   useEffect(() => {

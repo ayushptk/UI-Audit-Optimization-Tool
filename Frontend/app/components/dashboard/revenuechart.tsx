@@ -76,7 +76,7 @@ export default function RevenueAnalyticsChart() {
     ],
   };
 
-  const options = {
+  const options: any = {
     responsive: true,
     maintainAspectRatio: false,
     plugins: {

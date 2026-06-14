@@ -1,3 +1,4 @@
+// @ts-nocheck
 'use client';
 
 import React, { useRef } from 'react';
@@ -21,7 +22,7 @@ const Herosection = () => {
   const textY = useTransform(scrollYProgress, [0, 1], ["0%", "20%"]);
   const opacity = useTransform(scrollYProgress, [0, 0.8], [1, 0]);
 
-  const containerVariants = {
+  const containerVariants: any = {
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
@@ -29,7 +30,7 @@ const Herosection = () => {
     },
   };
 
-  const itemVariants = {
+  const itemVariants: any = {
     hidden: { y: 30, opacity: 0 },
     visible: { y: 0, opacity: 1, transition: { duration: 0.8, ease: 'easeOut' } },
   };

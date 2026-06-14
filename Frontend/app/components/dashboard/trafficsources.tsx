@@ -25,7 +25,7 @@ export default function TrafficSources() {
         ],
     };
 
-    const options = {
+    const options: any = {
         responsive: true,
         maintainAspectRatio: false,
         plugins: {

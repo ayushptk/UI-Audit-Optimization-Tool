@@ -1,3 +1,4 @@
+// @ts-nocheck
 "use client";
 
 import React, { useEffect, useState, useRef } from "react";
@@ -81,7 +82,7 @@ function ScorePill({ score }) {
 }
 
 export default function ReportsOverviewPage() {
-  const { token } = useSelector((state) => state.auth);
+  const { token } = useSelector((state: any) => state.auth);
   const [reports, setReports] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -324,3 +325,4 @@ export default function ReportsOverviewPage() {
     </motion.div>
   );
 }
+

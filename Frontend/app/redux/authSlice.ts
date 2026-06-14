@@ -18,7 +18,7 @@ const authSlice = createSlice({
       // Save token in browser storage
       localStorage.setItem("access_token", action.payload.token);
     },
-    logout: (state) => {
+    logout: (state: any) => {
       state.token = null;
       state.user = null;
       state.isAuthenticated = false;
@@ -36,3 +36,4 @@ const authSlice = createSlice({
 
 export const { setCredentials, logout, setUser } = authSlice.actions;
 export default authSlice.reducer;
+
